@@ -18,6 +18,8 @@ import University from "./University/University";
 import Program from "./Program/Program";
 import Dormitory from "./Dormitory/Dormitory";
 import DetailProgram from "./Program/DetailProgram";
+import DataStudent from "./DataStudent/DataStudent";
+import Login from "./Login/Login";
 
 export {
   Dormitory,
@@ -40,4 +42,6 @@ export {
   DetailInfoPassport,
   Program,
   DetailProgram,
+  DataStudent,
+  Login,
 };

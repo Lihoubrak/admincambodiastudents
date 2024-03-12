@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { GiGlassCelebration } from "react-icons/gi";
 import { ModalCreateProgram } from "../../components";
 import { Link } from "react-router-dom";
+import { TokenRequest } from "../../RequestMethod/Request";
 
 const Program = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [programs, setPrograms] = useState([]);
   const openModal = () => {
     setIsModalOpen(true);
   };
@@ -13,34 +14,17 @@ const Program = () => {
   const closeModal = () => {
     setIsModalOpen(false);
   };
-
-  // Sample program data
-  const programs = [
-    {
-      id: 1,
-      name: "Spring Festival",
-      date: "March 21, 2024",
-      location: "Hanoi",
-      imageUrl: "src/assets/khmer new year.jpg",
-      description: "Celebrate the arrival of spring with various activities.",
-    },
-    {
-      id: 1,
-      name: "Spring Festival",
-      date: "March 21, 2024",
-      location: "Hanoi",
-      imageUrl: "src/assets/khmer new year.jpg",
-      description: "Celebrate the arrival of spring with various activities.",
-    },
-    {
-      id: 1,
-      name: "Spring Festival",
-      date: "March 21, 2024",
-      location: "Hanoi",
-      imageUrl: "src/assets/khmer new year.jpg",
-      description: "Celebrate the arrival of spring with various activities.",
-    },
-  ];
+  const fetchPrograms = async () => {
+    try {
+      const res = await TokenRequest.get("/events/v9/all");
+      setPrograms(res.data);
+    } catch (error) {
+      console.error("Error fetching programs:", error);
+    }
+  };
+  useEffect(() => {
+    fetchPrograms();
+  }, []);
 
   return (
     <div>
@@ -67,18 +51,18 @@ const Program = () => {
             <div className="cursor-pointer rounded-lg overflow-hidden shadow-lg bg-white hover:shadow-xl transition duration-300">
               <img
                 className="w-full h-48 object-cover"
-                src={program.imageUrl}
-                alt={program.name}
+                src={program.eventImage}
+                alt={program.eventName}
               />
               <div className="px-6 py-4">
                 <div className="text-center">
                   <h1 className="font-bold text-xl mb-2 text-blue-500">
-                    {program.name}
+                    {program.eventName}
                   </h1>
-                  <p className="text-gray-700">{program.date}</p>
-                  <p className="text-gray-700">{program.location}</p>
+                  <p className="text-gray-700">{program.eventDate}</p>
+                  <p className="text-gray-700">{program.eventLocation}</p>
                   <p className="text-sm text-gray-500 mb-2">
-                    {program.description}
+                    {program.eventDescription}
                   </p>
                 </div>
               </div>
@@ -86,7 +70,11 @@ const Program = () => {
           </Link>
         ))}
       </div>
-      <ModalCreateProgram isOpen={isModalOpen} closeModal={closeModal} />
+      <ModalCreateProgram
+        isOpen={isModalOpen}
+        closeModal={closeModal}
+        fetchPrograms={fetchPrograms}
+      />
     </div>
   );
 };

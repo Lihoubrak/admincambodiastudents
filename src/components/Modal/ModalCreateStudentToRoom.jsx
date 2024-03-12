@@ -3,29 +3,25 @@ import Modal from "react-modal";
 import { FaTimesCircle } from "react-icons/fa";
 import { publicRequest } from "../../RequestMethod/Request";
 
-const ModalEditStudent = ({
-  isModalOpen,
-  setIsModalOpen,
-  studentId,
+const ModalCreateStudentToRoom = ({
+  setIsAddStudent,
+  isAddStudent,
+  roomId,
   fetchStudentsInRoom,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedStudent, setSelectedStudent] = useState(null);
   const [students, setStudents] = useState([]);
   useEffect(() => {
     const fetchAllStudents = async () => {
       try {
         const res = await publicRequest.get("/users/v1/all");
-        const filteredStudents = res.data.filter(
-          (student) => student.id !== studentId
-        );
-        setStudents(filteredStudents);
+        setStudents(res.data);
       } catch (error) {
         console.error("Error fetching students:", error);
       }
     };
     fetchAllStudents();
-  }, [studentId]);
+  }, []);
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
@@ -33,16 +29,17 @@ const ModalEditStudent = ({
 
   const handleSelectClick = async (student) => {
     try {
-      const switchRoom = await publicRequest.put("/rooms/v3/switchrooms", {
-        userAId: studentId,
-        userBId: student.id,
+      const res = await publicRequest.put(`/rooms/v3/addstudentroom`, {
+        roomId: roomId,
+        userId: student.id,
       });
       fetchStudentsInRoom();
-      setIsModalOpen(false);
+      setIsAddStudent(false);
     } catch (error) {
-      setIsModalOpen(false);
+      setIsAddStudent(false);
     }
   };
+
   const filteredStudents = students.filter(
     (student) =>
       student.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -52,8 +49,8 @@ const ModalEditStudent = ({
   return (
     <Modal
       ariaHideApp={false}
-      isOpen={isModalOpen}
-      onRequestClose={() => setIsModalOpen(false)}
+      isOpen={isAddStudent}
+      onRequestClose={() => setIsAddStudent(false)}
       contentLabel="Edit Modal"
       style={{
         overlay: {
@@ -74,9 +71,9 @@ const ModalEditStudent = ({
     >
       <div>
         <div className="modal-header flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Edit Student</h2>
+          <h2 className="text-xl font-bold">Add Student</h2>
           <button
-            onClick={() => setIsModalOpen(false)}
+            onClick={() => setIsAddStudent(false)}
             className=" flex items-center"
           >
             <FaTimesCircle className="mr-1" size={20} color="red" />
@@ -123,7 +120,7 @@ const ModalEditStudent = ({
                   className="bg-blue-500 text-white px-3 py-1 rounded mr-2"
                   onClick={() => handleSelectClick(student)}
                 >
-                  Select
+                  Add
                 </button>
               </div>
             </li>
@@ -134,4 +131,4 @@ const ModalEditStudent = ({
   );
 };
 
-export default ModalEditStudent;
+export default ModalCreateStudentToRoom;

@@ -1,10 +1,15 @@
 import React, { useState } from "react";
 import Modal from "react-modal";
+import { publicRequest } from "../../RequestMethod/Request";
+import { FaTimesCircle } from "react-icons/fa";
 
-const ModalCreateMajor = ({ isOpen, closeModal }) => {
+const ModalCreateMajor = ({ isOpen, closeModal, schoolId, fetchMajor }) => {
   const [majorInfo, setMajorInfo] = useState({
     name: "",
+    desc: "",
+    dateForStudying: "",
     image: null,
+    schoolId,
   });
 
   const handleChange = (e) => {
@@ -22,16 +27,41 @@ const ModalCreateMajor = ({ isOpen, closeModal }) => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Major info:", majorInfo);
-    closeModal();
+
+    const formData = new FormData();
+
+    formData.append("majorName", majorInfo.name);
+    formData.append("majorDescription", majorInfo.desc);
+    formData.append("majorImage", majorInfo.image);
+    formData.append("dateForStudying", majorInfo.dateForStudying);
+    formData.append("schoolId", majorInfo.schoolId);
+
+    try {
+      const res = await publicRequest.post("/majors/v5/create", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      setMajorInfo({
+        name: "",
+        desc: "",
+        dateForStudying: "",
+        image: null,
+        schoolId,
+      });
+      closeModal();
+      fetchMajor();
+    } catch (error) {
+      console.error("Error occurred:", error);
+    }
   };
 
   return (
     <Modal
       isOpen={isOpen}
-      onRequestClose={closeModal} // Make sure closeModal is passed to onRequestClose
+      onRequestClose={closeModal}
       style={{
         overlay: {
           zIndex: 1000,
@@ -56,10 +86,10 @@ const ModalCreateMajor = ({ isOpen, closeModal }) => {
       <div className="modal-header flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">Create New Major</h2>
         <button
-          onClick={closeModal} // Ensure closeModal is called on click
+          onClick={closeModal}
           className="text-blue-500 hover:text-blue-700"
         >
-          Close
+          <FaTimesCircle className="mr-1" size={20} color="red" />
         </button>
       </div>
       <div className="modal-content">
@@ -80,6 +110,39 @@ const ModalCreateMajor = ({ isOpen, closeModal }) => {
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="desc"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Description:
+            </label>
+            <input
+              type="text"
+              id="desc"
+              name="desc"
+              value={majorInfo.desc}
+              onChange={handleChange}
+              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="dateForStudying"
+              className="block text-sm font-medium text-gray-700"
+            >
+              DateForStudying:
+            </label>
+            <input
+              type="text"
+              id="dateForStudying"
+              name="dateForStudying"
+              value={majorInfo.dateForStudying}
+              onChange={handleChange}
+              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
           <div className="form-group mb-4">
             <label
               htmlFor="image"

@@ -1,13 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { FaTasks } from "react-icons/fa";
+import { TokenRequest, publicRequest } from "../../RequestMethod/Request";
+import Select from "react-select";
 const StudentTasks = () => {
   const [taskContent, setTaskContent] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
-  const [isSubmitted, setIsSubmitted] = useState(false); // State to track whether the task is submitted
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [type, setType] = useState("");
   const [files, setFiles] = useState([]);
-
+  const [selectedDormUniversity, setSelectedDormUniversity] = useState();
+  const [dorm, setDorm] = useState([]);
+  const options = dorm.map((item) => ({
+    label: item.dormName,
+    value: item.id,
+  }));
+  const handleChangeDormUniversity = (selectedOption) => {
+    setSelectedDormUniversity(selectedOption);
+  };
   const handleTaskContentChange = (content) => {
     setTaskContent(content);
   };
@@ -21,27 +32,45 @@ const StudentTasks = () => {
     setFiles(uploadedFiles);
   };
 
-  const handleSubmit = () => {
-    if (
-      taskContent.trim() === "" ||
-      taskDescription.trim() === "" ||
-      files.length === 0
-    ) {
-      alert(
-        "Please fill in both task description, content, and upload required files."
-      );
-      return;
-    }
-    // Logic for submitting the task (e.g., sending data to a server)
+  const handleSubmit = async () => {
+    const sendNotification = await TokenRequest.post(
+      "/notifications/v15/send",
+      {
+        description: taskDescription,
+        conten: taskContent,
+        file: "",
+        type: type,
+        dormId: selectedDormUniversity.value,
+      }
+    );
+    setTaskContent("");
+    setTaskDescription("");
     setIsSubmitted(true);
   };
-
+  useEffect(() => {
+    const fetchDorm = async () => {
+      const res = await TokenRequest.get("/dorms/v2/all");
+      setDorm(res.data);
+    };
+    fetchDorm();
+  }, []);
   return (
     <div>
       <h1 className="text-4xl gap-3 flex justify-center items-center font-bold mb-8 text-center text-blue-600">
         <FaTasks size={70} />
         <span>STUDENT TASK</span>
       </h1>
+      <div className="flex items-center gap-4">
+        <p className="font-bold text-red-600">Notification To:</p>
+        <Select
+          value={selectedDormUniversity}
+          onChange={handleChangeDormUniversity}
+          options={options}
+          defaultValue={options[0]}
+          placeholder="Select Dorm University"
+          className="w-60"
+        />
+      </div>
 
       <div className="mb-8">
         <div className="mb-4">

@@ -1,64 +1,56 @@
 import React, { useState } from "react";
 import Modal from "react-modal";
-import { TokenRequest, publicRequest } from "../../RequestMethod/Request";
+import { publicRequest } from "../../RequestMethod/Request";
 import { FaTimesCircle } from "react-icons/fa";
 
-const ModalCreateDormitory = ({ isOpen, closeModal, fetchAlldorm }) => {
-  const [dormInfo, setDormInfo] = useState({
-    name: "",
-    location: "",
-    desc: "",
-    image: null,
+const ModalCreateSupport = ({
+  programId,
+  isModalOpenCreateSupport,
+  setIsModalOpenCreateSupport,
+  fetchSupport,
+}) => {
+  const [supportEvent, setSupportEvent] = useState({
+    supportName: "",
+    supportSpecific: "",
+    typePay: "",
+    date: null,
+    EventId: programId,
   });
 
   const handleChange = (e) => {
-    if (e.target.name === "image") {
-      setDormInfo((prevInfo) => ({
-        ...prevInfo,
-        image: e.target.files[0],
-      }));
-    } else {
-      const { name, value } = e.target;
-      setDormInfo((prevInfo) => ({
-        ...prevInfo,
-        [name]: value,
-      }));
-    }
+    const { name, value } = e.target;
+    setSupportEvent((prevInfo) => ({
+      ...prevInfo,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const formData = new FormData();
-
-    formData.append("dormName", dormInfo.name);
-    formData.append("dormLocation", dormInfo.location);
-    formData.append("dormDescription", dormInfo.desc);
-    formData.append("dormImage", dormInfo.image);
     try {
-      const res = await TokenRequest.post("/dorms/v2/create", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      const res = await publicRequest.post(`/supportevents/v14/create`, {
+        supportName: supportEvent.supportName,
+        supportSpecific: supportEvent.supportSpecific,
+        date: supportEvent.date,
+        typePay: supportEvent.typePay,
+        eventId: supportEvent.EventId,
       });
-      setDormInfo({
-        name: "",
-        location: "",
-        desc: "",
-        image: null,
-      });
-      fetchAlldorm();
-      closeModal();
-    } catch (error) {
-      console.error("Error occurred:", error);
-    }
+    } catch (error) {}
+    setSupportEvent({
+      supportName: "",
+      supportSpecific: "",
+      typePay: "",
+      EventId: programId,
+    });
+    fetchSupport();
+    setIsModalOpenCreateSupport(false);
   };
 
   return (
     <Modal
       ariaHideApp={false}
-      isOpen={isOpen}
-      onRequestClose={closeModal}
+      isOpen={isModalOpenCreateSupport}
+      onRequestClose={() => setIsModalOpenCreateSupport(false)}
       style={{
         overlay: {
           zIndex: 1000,
@@ -81,10 +73,9 @@ const ModalCreateDormitory = ({ isOpen, closeModal, fetchAlldorm }) => {
       }}
     >
       <div className="modal-header flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Create New Dormitory</h2>
-
+        <h2 className="text-xl font-bold">Create Support</h2>
         <button
-          onClick={closeModal} // Ensure closeModal is called on click
+          onClick={() => setIsModalOpenCreateSupport(false)}
           className="text-blue-500 hover:text-blue-700"
         >
           <FaTimesCircle className="mr-1" size={20} color="red" />
@@ -94,85 +85,77 @@ const ModalCreateDormitory = ({ isOpen, closeModal, fetchAlldorm }) => {
         <form onSubmit={handleSubmit}>
           <div className="form-group mb-4">
             <label
-              htmlFor="name"
+              htmlFor="supportName"
               className="block text-sm font-medium text-gray-700"
             >
-              Dormitory Name:
+              Support Name:
             </label>
             <input
               type="text"
-              id="name"
-              name="name"
-              value={dormInfo.name}
+              id="supportName"
+              name="supportName"
+              value={supportEvent.supportName}
               onChange={handleChange}
+              required
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
           <div className="form-group mb-4">
             <label
-              htmlFor="desc"
+              htmlFor="supportSpecific"
               className="block text-sm font-medium text-gray-700"
             >
-              Description:
+              Support Specific:
             </label>
             <input
               type="text"
-              id="desc"
-              name="desc"
-              value={dormInfo.desc}
+              id="supportSpecific"
+              name="supportSpecific"
+              value={supportEvent.supportSpecific}
               onChange={handleChange}
+              required
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
           <div className="form-group mb-4">
             <label
-              htmlFor="location"
+              htmlFor="date"
               className="block text-sm font-medium text-gray-700"
             >
-              Location:
+              Date:
             </label>
             <input
-              type="text"
-              id="location"
-              name="location"
-              value={dormInfo.location}
+              type="date"
+              id="date"
+              name="date"
+              value={supportEvent.date}
               onChange={handleChange}
+              required
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
           <div className="form-group mb-4">
             <label
-              htmlFor="image"
+              htmlFor="typePay"
               className="block text-sm font-medium text-gray-700"
             >
-              Image:
+              typePay:
             </label>
             <input
-              type="file"
-              id="image"
-              name="image"
-              accept="image/*"
+              type="text"
+              id="typePay"
+              name="typePay"
+              value={supportEvent.typePay}
+              required
               onChange={handleChange}
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
-          {dormInfo.image && (
-            <div className="form-group mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Preview:
-              </label>
-              <img
-                src={URL.createObjectURL(dormInfo.image)}
-                alt="Preview"
-                className="mt-1 w-full"
-              />
-            </div>
-          )}
           <button
             type="submit"
             className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
           >
-            Create Dormitory
+            Create Support
           </button>
         </form>
       </div>
@@ -180,4 +163,4 @@ const ModalCreateDormitory = ({ isOpen, closeModal, fetchAlldorm }) => {
   );
 };
 
-export default ModalCreateDormitory;
+export default ModalCreateSupport;

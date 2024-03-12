@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -10,28 +10,37 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import {
-  FaCheck,
-  FaDownload,
-  FaFileImport,
-  FaPlus,
-  FaUser,
-} from "react-icons/fa"; // Added FaUser icon
 import Select from "react-select";
-import { Link } from "react-router-dom";
-import { ModalCreateMajor } from "../../components";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { publicRequest } from "../../RequestMethod/Request";
+import { FaInfoCircle, FaTrash } from "react-icons/fa";
 
 const DetailMajor = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedYear, setSelectedYear] = useState(null);
-
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
+  const [student, setStudent] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { majorId } = useParams();
+  const navigation = useNavigate();
+  useEffect(() => {
+    const fetchAllStudent = async () => {
+      setLoading(true);
+      try {
+        const res = await publicRequest.get(
+          `/majors/v5/detail/${majorId}?year=${
+            selectedYear ? selectedYear : new Date().getFullYear().toString()
+          }`
+        );
+        setStudent(res.data);
+        setLoading(false);
+      } catch (error) {
+        setStudent([]);
+        setError(error.response.data.error);
+        setLoading(false);
+      }
+    };
+    fetchAllStudent();
+  }, [majorId, selectedYear]);
 
   // Sample data for the chart
   const chartData = [
@@ -43,70 +52,26 @@ const DetailMajor = () => {
   ];
 
   const handleYearChange = (selectedOption) => {
-    setSelectedYear(selectedOption);
-    // Add logic here to fetch and display students for the selected year
+    setSelectedYear(selectedOption.value);
   };
 
   const yearOptions = [
-    { value: 2022, label: "2022" },
+    {
+      value: new Date().getFullYear().toString(),
+      label: new Date().getFullYear().toString(),
+    },
     { value: 2023, label: "2023" },
     // Add more years as needed
   ];
-
-  // Dummy rows for the data grid
-  const rows = [
-    {
-      id: 1,
-      profile: "/src/assets/Student.jpg",
-      firstName: "John",
-      lastName: "Doe",
-      age: 25,
-      GPA: 3.5,
-      status: "Active",
-    },
-    {
-      id: 2,
-      profile: "/src/assets/Student.jpg",
-      firstName: "Jane",
-      lastName: "Smith",
-      age: 22,
-      GPA: 3.9,
-      status: "Active",
-    },
-    {
-      id: 3,
-      profile: "/src/assets/Student.jpg",
-      firstName: "Tom",
-      lastName: "Brown",
-      age: 24,
-      GPA: 3.2,
-      status: "Inactive",
-    },
-    {
-      id: 4,
-      profile: "/src/assets/Student.jpg",
-      firstName: "Emily",
-      lastName: "Johnson",
-      age: 23,
-      GPA: 3.7,
-      status: "Active",
-    },
-    {
-      id: 5,
-      profile: "/src/assets/Student.jpg",
-      firstName: "Michael",
-      lastName: "Williams",
-      age: 21,
-      GPA: 3.6,
-      status: "Active",
-    },
-  ];
-
-  // Columns configuration for the data grid
+  const handleDelete = (id) => {};
+  const handleDetail = (id) => {
+    console.log(id);
+    navigation(`/university/student/${id}`);
+  };
   const columns = [
     { field: "id", headerName: "ID", width: 100 },
     {
-      field: "profile",
+      field: "avatar",
       headerName: "Profile",
       width: 150,
       renderCell: (params) => (
@@ -117,12 +82,66 @@ const DetailMajor = () => {
         />
       ),
     },
-    { field: "firstName", headerName: "First Name", width: 200 },
-    { field: "lastName", headerName: "Last Name", width: 200 },
-    { field: "age", headerName: "Age", width: 150 },
-    { field: "GPA", headerName: "GPA", width: 150 },
-    { field: "status", headerName: "Status", width: 150 },
+    {
+      field: "firstName",
+      headerName: "First Name",
+      width: 200,
+      editable: true,
+    },
+    { field: "lastName", headerName: "Last Name", width: 200, editable: true },
+    { field: "gender", headerName: "Gender", width: 150, editable: true },
+    { field: "age", headerName: "Age", width: 150, editable: true },
+    { field: "email", headerName: "Email", width: 150, editable: true },
+    {
+      field: "phoneNumber",
+      headerName: "Phone Number",
+      width: 150,
+      editable: true,
+    },
+    { field: "facebook", headerName: "Facebook", width: 150, editable: true },
+    { field: "zalo", headerName: "Zalo", width: 150, editable: true },
+    {
+      field: "Major.majorName",
+      headerName: "Major",
+      width: 150,
+      editable: true,
+    },
+    {
+      field: "delete",
+      headerName: "Action",
+      width: 120,
+      renderCell: (params) => (
+        <div>
+          <button
+            onClick={() => handleDetail(params.row.id)}
+            className="p-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 mr-2"
+          >
+            <FaInfoCircle />
+          </button>
+          <button
+            onClick={() => handleDelete(params.row.id)}
+            className="p-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+          >
+            <FaTrash />
+          </button>
+        </div>
+      ),
+    },
   ];
+
+  const formattedData = student.map((item, index) => ({
+    id: index + 1,
+    avatar: item.avatar,
+    firstName: item.firstName,
+    lastName: item.lastName,
+    gender: item.gender,
+    age: item.age,
+    email: item.email,
+    phoneNumber: item.phoneNumber,
+    facebook: item.facebook,
+    zalo: item.zalo,
+    "Major.majorName": item.Major ? item.Major.majorName : "",
+  }));
 
   return (
     <div className="container mx-auto">
@@ -145,7 +164,8 @@ const DetailMajor = () => {
 
       <div className="flex items-center  mb-4">
         <Select
-          value={selectedYear}
+          value={yearOptions.find((option) => option.value === selectedYear)}
+          defaultValue={yearOptions[0]}
           onChange={handleYearChange}
           options={yearOptions}
           placeholder="Select Year"
@@ -155,11 +175,14 @@ const DetailMajor = () => {
 
       <div style={{ height: 400, width: "100%", overflow: "auto" }}>
         <DataGrid
-          rows={rows}
+          editMode="cell"
+          rows={formattedData}
           columns={columns}
           pageSize={5}
           rowsPerPageOptions={[5, 10, 20]}
           disableSelectionOnClick
+          loading={loading}
+          localeText={{ noRowsLabel: error }}
           sx={{
             "& .MuiDataGrid-cell, & .MuiDataGrid-columnHeaderTitleContainer": {
               display: "flex",

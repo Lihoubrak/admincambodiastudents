@@ -1,15 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaTimesCircle } from "react-icons/fa";
 import Modal from "react-modal";
 import PassportInformation from "../Information/PassportInformation";
 import VisaInformation from "../Information/VisaInformation";
 import AcademicInformation from "../Information/AcademicInformation";
 import AccommodationInformation from "../Information/AccommodationInformation";
+import { publicRequest } from "../../RequestMethod/Request";
 
-const ModalDetailStudent = ({ detailModalOpen, setDetailModalOpen }) => {
+const ModalDetailStudent = ({
+  detailModalOpen,
+  setDetailModalOpen,
+  studentId,
+}) => {
   // State to keep track of active tab
   const [activeTab, setActiveTab] = useState("passport");
-
+  const [studentInfo, setStudentInfo] = useState(null);
+  useEffect(() => {
+    const fetchPassport = async () => {
+      const res = await publicRequest.get(`/passports/v6/detail/${studentId}`);
+      setStudentInfo(res.data);
+    };
+    fetchPassport();
+  }, [studentId]);
   // Function to handle tab click
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -19,9 +31,9 @@ const ModalDetailStudent = ({ detailModalOpen, setDetailModalOpen }) => {
   const renderTabContent = () => {
     switch (activeTab) {
       case "passport":
-        return <PassportInformation />;
+        return <PassportInformation studentInfo={studentInfo} />;
       case "visa":
-        return <VisaInformation />;
+        return <VisaInformation studentInfo={studentInfo} />;
       case "academic":
         return <AcademicInformation />;
       case "accommodation":
@@ -33,6 +45,7 @@ const ModalDetailStudent = ({ detailModalOpen, setDetailModalOpen }) => {
 
   return (
     <Modal
+      ariaHideApp={false}
       isOpen={detailModalOpen}
       onRequestClose={() => setDetailModalOpen(false)}
       contentLabel="Detail Modal"

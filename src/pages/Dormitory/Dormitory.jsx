@@ -1,19 +1,25 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ModalCreateDormitory } from "../../components";
 import { Link } from "react-router-dom";
 import { FaHome } from "react-icons/fa";
+import { TokenRequest } from "../../RequestMethod/Request";
 
 const Dormitory = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [dorm, setDorm] = useState([]);
   const openModal = () => {
     setIsModalOpen(true);
   };
-
   const closeModal = () => {
     setIsModalOpen(false);
   };
-
+  const fetchAlldorm = async () => {
+    const res = await TokenRequest.get("/dorms/v2/all");
+    setDorm(res.data);
+  };
+  useEffect(() => {
+    fetchAlldorm();
+  }, []);
   return (
     <div>
       <div className="flex justify-between items-center">
@@ -30,28 +36,39 @@ const Dormitory = () => {
       </div>
       <div className="flex flex-wrap gap-8 justify-center">
         {/* Dormitory Card 1 */}
-        <Link to={"/dormitory/1"} className="w-full max-w-[300px]">
-          <div className="cursor-pointer rounded-lg overflow-hidden shadow-lg bg-white hover:shadow-xl transition duration-300">
-            <img
-              className="w-full h-48 object-cover"
-              src="src/assets/image.jpg"
-              alt=""
-            />
-            <div className="px-6 py-4">
-              <div className="text-center">
-                <h1 className="font-bold text-xl mb-2 text-blue-500">
-                  HUST Dormitory
-                </h1>
-                <p className="text-gray-700">Hanoi</p>
-                <p className="text-sm text-gray-500 mb-2">
-                  Comfortable student living
-                </p>
+        {dorm.map((item, index) => (
+          <Link
+            to={`/dormitory/${item.id}`}
+            className="w-full max-w-[300px]"
+            key={item.id}
+          >
+            <div className="cursor-pointer rounded-lg overflow-hidden shadow-lg bg-white hover:shadow-xl transition duration-300">
+              <img
+                className="w-full h-48 object-cover"
+                src={item.dormImage}
+                alt=""
+              />
+              <div className="px-6 py-4">
+                <div className="text-center">
+                  <h1 className="font-bold text-xl mb-2 text-blue-500">
+                    {item.dormName}
+                  </h1>
+                  <p className="text-gray-700">{item.dormLocation}</p>
+                  <p className="text-sm text-gray-500 mb-2">
+                    {item.dormDescription}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        </Link>
+          </Link>
+        ))}
       </div>
-      <ModalCreateDormitory isOpen={isModalOpen} closeModal={closeModal} />
+
+      <ModalCreateDormitory
+        isOpen={isModalOpen}
+        closeModal={closeModal}
+        fetchAlldorm={fetchAlldorm}
+      />
     </div>
   );
 };

@@ -1,64 +1,65 @@
 import React, { useState } from "react";
 import Modal from "react-modal";
-import { TokenRequest, publicRequest } from "../../RequestMethod/Request";
+import axios from "axios"; // Import axios for making HTTP requests
+import { publicRequest } from "../../RequestMethod/Request";
 import { FaTimesCircle } from "react-icons/fa";
 
-const ModalCreateDormitory = ({ isOpen, closeModal, fetchAlldorm }) => {
-  const [dormInfo, setDormInfo] = useState({
-    name: "",
-    location: "",
-    desc: "",
-    image: null,
+const ModalCreateJoinProgram = ({
+  programId,
+  isModalOpenCreateJoinProgram,
+  setIsModalOpenCreateJoinProgram,
+  fetchParticipant,
+}) => {
+  const [participantData, setParticipantData] = useState({
+    date: "",
+    typePayMoney: "",
+    payMoney: "",
+    userId: 1,
+    eventId: programId,
   });
 
   const handleChange = (e) => {
-    if (e.target.name === "image") {
-      setDormInfo((prevInfo) => ({
-        ...prevInfo,
-        image: e.target.files[0],
-      }));
-    } else {
-      const { name, value } = e.target;
-      setDormInfo((prevInfo) => ({
-        ...prevInfo,
-        [name]: value,
-      }));
-    }
+    const { name, value } = e.target;
+    setParticipantData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const formData = new FormData();
-
-    formData.append("dormName", dormInfo.name);
-    formData.append("dormLocation", dormInfo.location);
-    formData.append("dormDescription", dormInfo.desc);
-    formData.append("dormImage", dormInfo.image);
     try {
-      const res = await TokenRequest.post("/dorms/v2/create", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      // Make a POST request to your backend endpoint
+      const response = await publicRequest.post(
+        "/participantevents/v11/create",
+        {
+          date: participantData.date,
+          typePayMoney: participantData.typePayMoney,
+          payMoney: participantData.payMoney,
+          userId: participantData.userId,
+          eventId: participantData.eventId,
+        }
+      );
+      fetchParticipant();
+      setIsModalOpenCreateJoinProgram(false);
+      setParticipantData({
+        date: "",
+        typePayMoney: "",
+        payMoney: "",
+        userId: 1,
+        eventId: programId,
       });
-      setDormInfo({
-        name: "",
-        location: "",
-        desc: "",
-        image: null,
-      });
-      fetchAlldorm();
-      closeModal();
     } catch (error) {
-      console.error("Error occurred:", error);
+      console.error("Error:", error);
+      // Handle errors here (e.g., show error message to the user)
     }
   };
 
   return (
     <Modal
       ariaHideApp={false}
-      isOpen={isOpen}
-      onRequestClose={closeModal}
+      isOpen={isModalOpenCreateJoinProgram}
+      onRequestClose={() => setIsModalOpenCreateJoinProgram(false)}
       style={{
         overlay: {
           zIndex: 1000,
@@ -81,10 +82,9 @@ const ModalCreateDormitory = ({ isOpen, closeModal, fetchAlldorm }) => {
       }}
     >
       <div className="modal-header flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Create New Dormitory</h2>
-
+        <h2 className="text-xl font-bold"> Create Join Program</h2>
         <button
-          onClick={closeModal} // Ensure closeModal is called on click
+          onClick={() => setIsModalOpenCreateJoinProgram(false)}
           className="text-blue-500 hover:text-blue-700"
         >
           <FaTimesCircle className="mr-1" size={20} color="red" />
@@ -94,85 +94,77 @@ const ModalCreateDormitory = ({ isOpen, closeModal, fetchAlldorm }) => {
         <form onSubmit={handleSubmit}>
           <div className="form-group mb-4">
             <label
-              htmlFor="name"
+              htmlFor="userId"
               className="block text-sm font-medium text-gray-700"
             >
-              Dormitory Name:
+              UserId:
             </label>
             <input
-              type="text"
-              id="name"
-              name="name"
-              value={dormInfo.name}
+              type="number"
+              id="userId"
+              name="userId"
+              value={participantData.userId}
               onChange={handleChange}
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              required
             />
           </div>
           <div className="form-group mb-4">
             <label
-              htmlFor="desc"
+              htmlFor="date"
               className="block text-sm font-medium text-gray-700"
             >
-              Description:
+              Date:
             </label>
             <input
-              type="text"
-              id="desc"
-              name="desc"
-              value={dormInfo.desc}
+              type="date"
+              id="date"
+              name="date"
+              value={participantData.date}
               onChange={handleChange}
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              required
             />
           </div>
           <div className="form-group mb-4">
             <label
-              htmlFor="location"
+              htmlFor="typePayMoney"
               className="block text-sm font-medium text-gray-700"
             >
-              Location:
+              Payment Type:
             </label>
             <input
               type="text"
-              id="location"
-              name="location"
-              value={dormInfo.location}
+              id="typePayMoney"
+              name="typePayMoney"
+              value={participantData.typePayMoney}
               onChange={handleChange}
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              required
             />
           </div>
           <div className="form-group mb-4">
             <label
-              htmlFor="image"
+              htmlFor="payMoney"
               className="block text-sm font-medium text-gray-700"
             >
-              Image:
+              Payment Amount:
             </label>
             <input
-              type="file"
-              id="image"
-              name="image"
-              accept="image/*"
+              type="number"
+              id="payMoney"
+              name="payMoney"
+              value={participantData.payMoney}
               onChange={handleChange}
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              required
             />
           </div>
-          {dormInfo.image && (
-            <div className="form-group mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Preview:
-              </label>
-              <img
-                src={URL.createObjectURL(dormInfo.image)}
-                alt="Preview"
-                className="mt-1 w-full"
-              />
-            </div>
-          )}
           <button
             type="submit"
             className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
           >
-            Create Dormitory
+            Create Participant Event
           </button>
         </form>
       </div>
@@ -180,4 +172,4 @@ const ModalCreateDormitory = ({ isOpen, closeModal, fetchAlldorm }) => {
   );
 };
 
-export default ModalCreateDormitory;
+export default ModalCreateJoinProgram;

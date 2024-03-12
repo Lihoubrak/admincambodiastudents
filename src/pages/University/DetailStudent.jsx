@@ -21,7 +21,7 @@ const DetailStudent = () => {
   const studentImage = "/src/assets/Student.jpg";
 
   return (
-    <div className="container mx-auto py-8">
+    <div>
       {/* Student Information */}
       <div className="flex flex-col items-center">
         <div className="flex gap-5 justify-center items-center">

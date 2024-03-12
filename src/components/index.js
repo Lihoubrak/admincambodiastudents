@@ -17,6 +17,14 @@ import ModalCreatePatient from "./Modal/ModalCreatePatient";
 import ModalEditPassport from "./Modal/ModalEditPassport";
 import ModalEditVisa from "./Modal/ModalEditVisa";
 import ModalCreateProgram from "./Modal/ModalCreateProgram";
+import ModalEditProgram from "./Modal/ModalEditProgam";
+import ModalCreateProductEvent from "./Modal/ModalCreateProductEvent";
+import ModalCreateSupport from "./Modal/ModalCreateSupport";
+import ModalCreateJoinProgram from "./Modal/ModalCreateJoinProgram";
+import TableJoinProgram from "./Table/TableJoinProgram";
+import TableProductProgram from "./Table/TableProductProgram";
+import TableSupportProgram from "./Table/TableSupportProgram";
+import ModalCreateStudentToRoom from "./Modal/ModalCreateStudentToRoom";
 
 export {
   ModalCreateRoom,
@@ -38,4 +46,12 @@ export {
   ModalEditPassport,
   ModalEditVisa,
   ModalCreateProgram,
+  ModalEditProgram,
+  ModalCreateProductEvent,
+  ModalCreateSupport,
+  ModalCreateJoinProgram,
+  TableJoinProgram,
+  TableProductProgram,
+  TableSupportProgram,
+  ModalCreateStudentToRoom,
 };

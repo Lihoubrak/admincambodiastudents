@@ -1,14 +1,22 @@
 import { DataGrid } from "@mui/x-data-grid";
 import React, { useCallback, useRef } from "react";
-import { FaDownload, FaFileImport, FaPlus } from "react-icons/fa";
-import { utils, writeFile } from "xlsx";
-const TableContributions = ({
-  openStudentContributionModal,
-  formatStudentContributions,
-  studentContributionsError,
+import {
+  FaDownload,
+  FaFileImport,
+  FaPlus,
+  FaSave,
+  FaTrash,
+} from "react-icons/fa";
+import * as XLSX from "xlsx";
+
+const TableJoinProgram = ({
+  formatParticipant,
+  setIsModalOpenCreateJoinProgram,
   loading,
+  participantEventError,
 }) => {
-  const studentColumns = [
+  const handleDelete = (id) => {};
+  const columnsJoinProgram = [
     { field: "id", headerName: "No", width: 120, editable: true },
     {
       field: "avatar",
@@ -46,43 +54,56 @@ const TableContributions = ({
       editable: true,
     },
     { field: "date", headerName: "Date", width: 150, editable: true },
+    {
+      field: "delete",
+      headerName: "Action",
+      width: 120,
+      renderCell: (params) => (
+        <button
+          onClick={() => handleDelete(params.row.id)}
+          className="p-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+        >
+          <FaTrash />
+        </button>
+      ),
+    },
   ];
-  const exportFileOfContribution = useCallback(() => {
-    const ws = utils.json_to_sheet(formatStudentContributions);
-    const wb = utils.book_new();
-    utils.book_append_sheet(wb, ws, "Contributions Data");
-    writeFile(wb, "contributions.xlsx");
-  }, [formatStudentContributions]);
-  const totalStudentContribution = formatStudentContributions.reduce(
-    (total, student) => total + student.payMoney,
-    0
-  );
+  const handleExportFile = useCallback(() => {
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(formatParticipant);
+    XLSX.utils.book_append_sheet(wb, ws, "Data");
+    XLSX.writeFile(wb, "Join Program.xlsx");
+  }, [formatParticipant]);
+  const totalMoney = formatParticipant.reduce((accumulator, currentItem) => {
+    const payMoney = parseFloat(currentItem.payMoney);
+    if (!isNaN(payMoney)) {
+      return accumulator + payMoney;
+    } else {
+      return accumulator;
+    }
+  }, 0); // Initial value of the accumulator is set to 0
+
   return (
-    <div className="mb-4">
-      <div className="flex items-center justify-between mb-4">
+    <div>
+      <div className="flex items-center justify-between my-4">
         <h2 className="text-2xl font-bold mb-2 text-blue-700">
-          STUDENT CONTRIBUTIONS
+          JOIN PROGRAM PARTICIPANTS
         </h2>
         <div className="flex items-center gap-4">
-          <div className="cursor-pointer p-2 rounded-md overflow-hidden shadow-md border border-blue-600 flex items-center justify-center bg-blue-600 hover:bg-blue-700 transition duration-300">
-            <FaPlus
-              onClick={openStudentContributionModal}
-              className="text-white text-2xl"
-            />
+          <div
+            onClick={() => setIsModalOpenCreateJoinProgram(true)}
+            className="cursor-pointer p-2 rounded-md overflow-hidden shadow-md border border-blue-600 flex items-center justify-center bg-blue-600 hover:bg-blue-700 transition duration-300"
+          >
+            <FaPlus className="text-white text-2xl" />
           </div>
           <button
-            onClick={
-              formatStudentContributions.length > 0
-                ? exportFileOfContribution
-                : null
-            }
+            onClick={formatParticipant.length > 0 ? handleExportFile : null}
             className={`cursor-pointer p-2 rounded-md overflow-hidden shadow-md border border-yellow-600 flex items-center justify-center bg-yellow-600 ${
-              formatStudentContributions.length > 0 && "hover:bg-yellow-700"
+              formatParticipant.length > 0 && "hover:bg-yellow-700"
             } ${
-              formatStudentContributions.length === 0 &&
-              "opacity-50 cursor-not-allowed"
+              formatParticipant.length === 0 && "opacity-50 cursor-not-allowed"
             } transition duration-300`}
-            disabled={formatStudentContributions.length === 0}
+            disabled={formatParticipant.length === 0}
           >
             <FaDownload className="text-white text-2xl" />
           </button>
@@ -90,13 +111,15 @@ const TableContributions = ({
       </div>
       <div style={{ height: 400, width: "100%", overflow: "auto" }}>
         <DataGrid
-          rows={formatStudentContributions}
-          columns={studentColumns}
+          rows={formatParticipant}
+          columns={columnsJoinProgram}
           pageSize={5}
           rowsPerPageOptions={[5, 10, 20]}
           disableSelectionOnClick
           loading={loading}
-          localeText={{ noRowsLabel: studentContributionsError }}
+          localeText={{
+            noRowsLabel: participantEventError,
+          }}
           sx={{
             "& .MuiDataGrid-cell, & .MuiDataGrid-columnHeaderTitleContainer": {
               display: "flex",
@@ -109,16 +132,14 @@ const TableContributions = ({
           }}
         />
       </div>
-      <div className="mb-4">
-        <h2 className="text-xl font-bold mb-2 text-red-700">
-          Total Contribution
+      <div className="mt-4">
+        <h2 className="text-lg font-bold mb-2 text-red-700">
+          TOTAL JOIN PROGRAM PARTICIPANTS
         </h2>
-        <p className="font-bold">
-          Total: {totalStudentContribution.toLocaleString()} dong
-        </p>
+        <p className="font-bold">Total: {totalMoney} dong</p>
       </div>
     </div>
   );
 };
 
-export default TableContributions;
+export default TableJoinProgram;

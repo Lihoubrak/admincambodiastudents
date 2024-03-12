@@ -10,14 +10,13 @@ import {
   FaPassport,
   FaHospital,
   FaBolt,
-  FaTint,
-  FaArchive,
+  FaDatabase,
 } from "react-icons/fa";
 import { GiGlassCelebration } from "react-icons/gi";
 import logo from "../assets/logo.png"; // Import the logo image
 
 const sidebarLinks = [
-  { icon: <FaUser size={25} />, label: "University", to: "/university" },
+  { icon: <FaUser size={25} />, label: "University", to: "/" },
   { icon: <FaBed size={25} />, label: "Dormitory", to: "/dormitory" },
   { icon: <FaInbox size={25} />, label: "Inbox", to: "/inbox" },
   {
@@ -33,7 +32,8 @@ const sidebarLinks = [
     label: "Electricity Water",
     to: "/electricitywater",
   },
-  { icon: <GiGlassCelebration size={30} />, label: "Program", to: "/" },
+  { icon: <GiGlassCelebration size={30} />, label: "Program", to: "/program" },
+  { icon: <FaDatabase size={25} />, label: "Import & Export", to: "/data" },
 ];
 
 const Sidebar = ({ isSidebarOpen }) => {

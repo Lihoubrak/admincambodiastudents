@@ -1,24 +1,57 @@
 import React, { useState } from "react";
 import Modal from "react-modal";
+import { publicRequest } from "../../RequestMethod/Request";
+import { FaTimesCircle } from "react-icons/fa";
 
-const ModalCreateStudentContribution = ({ isOpen, closeModal }) => {
-  const [roomNumber, setRoomNumber] = useState("");
+const ModalCreateStudentContribution = ({
+  isOpen,
+  closeModal,
+  fetchContribution,
+}) => {
+  const [participantData, setParticipantData] = useState({
+    date: "",
+    typePayMoney: "",
+    payMoney: "",
+    userId: 1,
+  });
 
-  const handleRoomNumberChange = (e) => {
-    setRoomNumber(e.target.value);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setParticipantData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Here you can perform any actions with the room information,
-    // such as submitting it to a server or storing it locally
-    console.log("Room Number:", roomNumber);
-    // Close the modal after submission
-    closeModal();
+    try {
+      // Make a POST request to your backend endpoint
+      const response = await publicRequest.post(
+        "/contributionhealthcares/v13/create",
+        {
+          date: participantData.date,
+          typePayMoney: participantData.typePayMoney,
+          payMoney: participantData.payMoney,
+          userId: participantData.userId,
+        }
+      );
+      closeModal();
+      fetchContribution();
+      setParticipantData({
+        date: "",
+        typePayMoney: "",
+        payMoney: "",
+        userId: 1,
+      });
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   return (
     <Modal
+      ariaHideApp={false}
       isOpen={isOpen}
       onRequestClose={closeModal}
       style={{
@@ -43,36 +76,89 @@ const ModalCreateStudentContribution = ({ isOpen, closeModal }) => {
       }}
     >
       <div className="modal-header flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Create New Room</h2>
+        <h2 className="text-xl font-bold"> Create Student Contribution</h2>
         <button
           onClick={closeModal}
           className="text-blue-500 hover:text-blue-700"
         >
-          Close
+          <FaTimesCircle className="mr-1" size={20} color="red" />
         </button>
       </div>
       <div className="modal-content">
         <form onSubmit={handleSubmit}>
           <div className="form-group mb-4">
             <label
-              htmlFor="roomNumber"
+              htmlFor="userId"
               className="block text-sm font-medium text-gray-700"
             >
-              Room Number:
+              UserId:
+            </label>
+            <input
+              type="number"
+              id="userId"
+              name="userId"
+              value={participantData.userId}
+              onChange={handleChange}
+              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="date"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Date:
+            </label>
+            <input
+              type="date"
+              id="date"
+              name="date"
+              value={participantData.date}
+              onChange={handleChange}
+              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="typePayMoney"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Payment Type:
             </label>
             <input
               type="text"
-              id="roomNumber"
-              value={roomNumber}
-              onChange={handleRoomNumberChange}
+              id="typePayMoney"
+              name="typePayMoney"
+              value={participantData.typePayMoney}
+              onChange={handleChange}
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="payMoney"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Payment Amount:
+            </label>
+            <input
+              type="number"
+              id="payMoney"
+              name="payMoney"
+              value={participantData.payMoney}
+              onChange={handleChange}
+              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              required
             />
           </div>
           <button
             type="submit"
             className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
           >
-            Create Room
+            Create Contribution
           </button>
         </form>
       </div>

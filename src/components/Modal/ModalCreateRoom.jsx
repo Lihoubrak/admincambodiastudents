@@ -1,19 +1,29 @@
 import React, { useState } from "react";
 import Modal from "react-modal";
+import { publicRequest } from "../../RequestMethod/Request";
+import { FaTimesCircle } from "react-icons/fa";
 
-const ModalCreateRoom = ({ isOpen, closeModal }) => {
+const ModalCreateRoom = ({ isOpen, closeModal, dormId, fetchAllRooms }) => {
   const [roomNumber, setRoomNumber] = useState("");
+  const [numberOfStudents, setNumberOfStudents] = useState(""); // Added state for number of students
 
   const handleRoomNumberChange = (e) => {
     setRoomNumber(e.target.value);
   };
 
-  const handleSubmit = (e) => {
+  const handlenumberOfStudentsChange = (e) => {
+    // Handler function for number of students input
+    setNumberOfStudents(e.target.value);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Here you can perform any actions with the room information,
-    // such as submitting it to a server or storing it locally
-    console.log("Room Number:", roomNumber);
-    // Close the modal after submission
+    const res = await publicRequest.post("/rooms/v3/create", {
+      roomNumber,
+      numberOfStudents,
+      dormitoryId: dormId,
+    });
+    fetchAllRooms();
     closeModal();
   };
 
@@ -21,6 +31,7 @@ const ModalCreateRoom = ({ isOpen, closeModal }) => {
     <Modal
       isOpen={isOpen}
       onRequestClose={closeModal}
+      ariaHideApp={false}
       style={{
         overlay: {
           zIndex: 1000,
@@ -48,7 +59,7 @@ const ModalCreateRoom = ({ isOpen, closeModal }) => {
           onClick={closeModal}
           className="text-blue-500 hover:text-blue-700"
         >
-          Close
+          <FaTimesCircle className="mr-1" size={20} color="red" />
         </button>
       </div>
       <div className="modal-content">
@@ -65,6 +76,21 @@ const ModalCreateRoom = ({ isOpen, closeModal }) => {
               id="roomNumber"
               value={roomNumber}
               onChange={handleRoomNumberChange}
+              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="numberOfStudents"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Number of Students:
+            </label>
+            <input
+              type="text"
+              id="numberOfStudents"
+              value={numberOfStudents}
+              onChange={handlenumberOfStudentsChange}
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>

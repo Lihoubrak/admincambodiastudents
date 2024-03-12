@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ModalCreateUniversity } from "../../components";
 import { FaUniversity } from "react-icons/fa";
+import { publicRequest } from "../../RequestMethod/Request";
 
 const University = () => {
   // Static data for a university
-  const universityData = {
+  const item = {
     name: "List of University",
     location: "Hanoi",
     imageUrl: "src/assets/image.jpg",
@@ -13,7 +14,7 @@ const University = () => {
     establishmentYear: 1970,
   };
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [university, setUniveresity] = useState([]);
   const openModal = () => {
     setIsModalOpen(true);
   };
@@ -21,6 +22,13 @@ const University = () => {
   const closeModal = () => {
     setIsModalOpen(false);
   };
+  const fetchAllUniversity = async () => {
+    const res = await publicRequest.get("/schools/v4/all");
+    setUniveresity(res.data);
+  };
+  useEffect(() => {
+    fetchAllUniversity();
+  }, []);
   return (
     <div>
       <div className="flex justify-between items-center">
@@ -37,37 +45,38 @@ const University = () => {
         </div>
       </div>
       <div className="flex flex-wrap gap-8 justify-center">
-        {/* University Card */}
-        <Link to="/university/:universityId">
-          {/* Replace "/some-route" with the appropriate route */}
-          <div className="max-w-[300px] cursor-pointer rounded overflow-hidden shadow-lg bg-white hover:shadow-xl transition duration-300">
-            <img
-              className="w-full h-48 object-cover rounded-t"
-              src={universityData.imageUrl}
-              alt={universityData.name}
-            />
-            <div className="px-6 py-4">
-              <div className="text-center">
-                <h1 className="font-bold text-xl mb-2 text-blue-500">HUST</h1>
-                <p className="text-gray-700">{universityData.location}</p>
-                <p className="text-sm text-gray-500 mb-2">
-                  {universityData.description}
-                </p>
-                {/* Additional Information */}
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">
-                    Est. {universityData.establishmentYear}
-                  </span>
-                  <button className="px-3 py-1 text-sm text-white bg-blue-600 rounded-full hover:bg-blue-700 transition duration-300">
-                    View Details
-                  </button>
+        {university.map((item, index) => (
+          <Link
+            to={`/university/${item.id}`}
+            className="w-full max-w-[300px]"
+            key={item.id}
+          >
+            <div className="cursor-pointer rounded-lg overflow-hidden shadow-lg bg-white hover:shadow-xl transition duration-300">
+              <img
+                className="w-full h-48 object-cover"
+                src={item.schoolImage}
+                alt={item.schoolName}
+              />
+              <div className="px-6 py-4">
+                <div className="text-center">
+                  <h1 className="font-bold text-xl mb-2 text-blue-500">
+                    {item.schoolName}
+                  </h1>
+                  <p className="text-gray-700">{item.schoolLocation}</p>
+                  <p className="text-sm text-gray-500 mb-2">
+                    {item.schoolDescription}
+                  </p>
                 </div>
               </div>
             </div>
-          </div>
-        </Link>
+          </Link>
+        ))}
       </div>
-      <ModalCreateUniversity isOpen={isModalOpen} closeModal={closeModal} />
+      <ModalCreateUniversity
+        isOpen={isModalOpen}
+        closeModal={closeModal}
+        fetchAllUniversity={fetchAllUniversity}
+      />
     </div>
   );
 };

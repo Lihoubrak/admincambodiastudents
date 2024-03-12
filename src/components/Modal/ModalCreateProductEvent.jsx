@@ -1,51 +1,71 @@
 import React, { useState } from "react";
 import Modal from "react-modal";
 import { publicRequest } from "../../RequestMethod/Request";
+import { useParams } from "react-router-dom";
 import { FaTimesCircle } from "react-icons/fa";
 
-const ModalCreatePatient = ({ isOpen, closeModal, fetchPatients }) => {
-  const [formData, setFormData] = useState({
-    date: "",
-    note: "",
-    cost: "",
-    discount: "",
-    hospital: "",
-    typeofDisease: "",
-    userId: 3,
-  });
+const ModalCreateProductEvent = ({
+  isModalOpenCreate,
+  setIsModalOpenCreate,
+  programId,
+  fetchProduct,
+}) => {
+  const [productName, setProductName] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [price, setPrice] = useState("");
+  const [date, setDate] = useState("");
+  const [note, setNote] = useState("");
+  const handleProductNameChange = (e) => {
+    setProductName(e.target.value);
+  };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+  const handleQuantityChange = (e) => {
+    setQuantity(e.target.value);
+  };
+
+  const handlePriceChange = (e) => {
+    setPrice(e.target.value);
+  };
+
+  const handleDateChange = (e) => {
+    setDate(e.target.value);
+  };
+
+  const handleNoteChange = (e) => {
+    setNote(e.target.value);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const res = await publicRequest.post("/heathcares/v12/create", {
-        date: formData.date,
-        note: formData.note,
-        cost: formData.cost,
-        discount: formData.discount,
-        hospital: formData.hospital,
-        typeofDisease: formData.typeofDisease,
-        userId: formData.userId,
-      });
-      fetchPatients();
-      closeModal();
-    } catch (error) {
-      console.log(error);
-    }
+    const eventData = {
+      productName,
+      quantity,
+      price,
+      date,
+      note,
+    };
+    const res = await publicRequest.post(`/productevents/v10/create`, {
+      productName: eventData.productName,
+      productQuantity: eventData.quantity,
+      productPriceUnit: eventData.price,
+      dateBuy: eventData.date,
+      note: eventData.note,
+      eventId: programId,
+    });
+    console.log(res.data);
+    fetchProduct();
+    setPrice("");
+    setNote("");
+    setProductName("");
+    setQuantity("");
+    setIsModalOpenCreate(false);
   };
 
   return (
     <Modal
-      isOpen={isOpen}
       ariaHideApp={false}
-      onRequestClose={closeModal}
+      isOpen={isModalOpenCreate}
+      onRequestClose={() => setIsModalOpenCreate(false)}
       style={{
         overlay: {
           zIndex: 1000,
@@ -68,9 +88,9 @@ const ModalCreatePatient = ({ isOpen, closeModal, fetchPatients }) => {
       }}
     >
       <div className="modal-header flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Create New Patient</h2>
+        <h2 className="text-xl font-bold">Create New Product Event</h2>{" "}
         <button
-          onClick={closeModal}
+          onClick={() => setIsModalOpenCreate(false)}
           className="text-blue-500 hover:text-blue-700"
         >
           <FaTimesCircle className="mr-1" size={20} color="red" />
@@ -80,17 +100,49 @@ const ModalCreatePatient = ({ isOpen, closeModal, fetchPatients }) => {
         <form onSubmit={handleSubmit}>
           <div className="form-group mb-4">
             <label
-              htmlFor="userId"
+              htmlFor="name"
               className="block text-sm font-medium text-gray-700"
             >
-              User ID:
+              Product Name:
             </label>
             <input
               type="text"
-              id="userId"
-              name="userId"
-              value={formData.userId}
-              onChange={handleChange}
+              id="name"
+              required
+              value={productName}
+              onChange={handleProductNameChange}
+              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="quantity"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Quantity:
+            </label>
+            <input
+              type="text"
+              id="quantity"
+              value={quantity}
+              required
+              onChange={handleQuantityChange}
+              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="price"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Price (per unit):
+            </label>
+            <input
+              type="text"
+              id="price"
+              value={price}
+              required
+              onChange={handlePriceChange}
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -99,14 +151,14 @@ const ModalCreatePatient = ({ isOpen, closeModal, fetchPatients }) => {
               htmlFor="date"
               className="block text-sm font-medium text-gray-700"
             >
-              Date:
+              Purchase Date:
             </label>
             <input
               type="date"
               id="date"
-              name="date"
-              value={formData.date}
-              onChange={handleChange}
+              required
+              value={date}
+              onChange={handleDateChange}
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -120,73 +172,8 @@ const ModalCreatePatient = ({ isOpen, closeModal, fetchPatients }) => {
             <input
               type="text"
               id="note"
-              name="note"
-              value={formData.note}
-              onChange={handleChange}
-              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          <div className="form-group mb-4">
-            <label
-              htmlFor="cost"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Cost:
-            </label>
-            <input
-              type="text"
-              id="cost"
-              name="cost"
-              value={formData.cost}
-              onChange={handleChange}
-              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          <div className="form-group mb-4">
-            <label
-              htmlFor="discount"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Discount:
-            </label>
-            <input
-              type="text"
-              id="discount"
-              name="discount"
-              value={formData.discount}
-              onChange={handleChange}
-              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          <div className="form-group mb-4">
-            <label
-              htmlFor="typeofDisease"
-              className="block text-sm font-medium text-gray-700"
-            >
-              TypeofDisease:
-            </label>
-            <input
-              type="text"
-              id="typeofDisease"
-              name="typeofDisease"
-              value={formData.typeofDisease}
-              onChange={handleChange}
-              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          <div className="form-group mb-4">
-            <label
-              htmlFor="hospital"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Hospital:
-            </label>
-            <input
-              type="text"
-              id="hospital"
-              name="hospital"
-              value={formData.hospital}
-              onChange={handleChange}
+              value={note}
+              onChange={handleNoteChange}
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -194,7 +181,7 @@ const ModalCreatePatient = ({ isOpen, closeModal, fetchPatients }) => {
             type="submit"
             className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
           >
-            Create Patient
+            Create Product
           </button>
         </form>
       </div>
@@ -202,4 +189,4 @@ const ModalCreatePatient = ({ isOpen, closeModal, fetchPatients }) => {
   );
 };
 
-export default ModalCreatePatient;
+export default ModalCreateProductEvent;

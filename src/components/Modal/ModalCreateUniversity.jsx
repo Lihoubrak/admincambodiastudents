@@ -1,11 +1,15 @@
 import React, { useState } from "react";
 import Modal from "react-modal";
+import { publicRequest } from "../../RequestMethod/Request";
+import { FaTimesCircle } from "react-icons/fa";
 
-const ModalCreateUniversity = ({ isOpen, closeModal }) => {
+const ModalCreateUniversity = ({ isOpen, closeModal, fetchAllUniversity }) => {
   const [universityInfo, setUniversityInfo] = useState({
     name: "",
     location: "",
+    desc: "",
     image: null,
+    userId: 3,
   });
 
   const handleChange = (e) => {
@@ -23,14 +27,40 @@ const ModalCreateUniversity = ({ isOpen, closeModal }) => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("University info:", universityInfo);
-    closeModal();
+
+    const formData = new FormData();
+
+    formData.append("schoolName", universityInfo.name);
+    formData.append("schoolLocation", universityInfo.location);
+    formData.append("schoolDescription", universityInfo.desc);
+    formData.append("schoolImage", universityInfo.image);
+    formData.append("userId", universityInfo.userId);
+
+    try {
+      const res = await publicRequest.post(`/schools/v4/create`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      setUniversityInfo({
+        name: "",
+        location: "",
+        desc: "",
+        image: null,
+        userId: 1,
+      });
+      fetchAllUniversity();
+      closeModal();
+    } catch (error) {
+      console.error("Error occurred:", error);
+    }
   };
 
   return (
     <Modal
+      ariaHideApp={false}
       isOpen={isOpen}
       onRequestClose={closeModal}
       style={{
@@ -60,7 +90,7 @@ const ModalCreateUniversity = ({ isOpen, closeModal }) => {
           onClick={closeModal}
           className="text-blue-500 hover:text-blue-700"
         >
-          Close
+          <FaTimesCircle className="mr-1" size={20} color="red" />
         </button>
       </div>
       <div className="modal-content">
@@ -77,6 +107,22 @@ const ModalCreateUniversity = ({ isOpen, closeModal }) => {
               id="name"
               name="name"
               value={universityInfo.name}
+              onChange={handleChange}
+              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="desc"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Description:
+            </label>
+            <input
+              type="text"
+              id="desc"
+              name="desc"
+              value={universityInfo.desc}
               onChange={handleChange}
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />

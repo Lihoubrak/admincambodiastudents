@@ -1,52 +1,88 @@
 import React, { useState } from "react";
 import Modal from "react-modal";
+import { TokenRequest, publicRequest } from "../../RequestMethod/Request";
+import { FaTimesCircle } from "react-icons/fa";
 
-const ModalCreateProgram = ({ isOpen, closeModal }) => {
-  const [programName, setProgramName] = useState("");
-  const [programDate, setProgramDate] = useState("");
-  const [programLocation, setProgramLocation] = useState("");
-  const [programDescription, setProgramDescription] = useState("");
-  const [programImage, setProgramImage] = useState(null);
+const ModalCreateProgram = ({ isOpen, closeModal, fetchPrograms }) => {
+  const [event, setEvent] = useState({
+    eventName: "",
+    eventLocation: "",
+    eventDescription: "",
+    eventDate: "",
+    eventExpiry: "",
+    eventImage: null,
+    foodMenu: "",
+    eventsInProgram: "",
+    ticketPrice: "",
+    paymentPerStudent: "",
+    numberOfTicket: "",
+    userId: 3,
+  });
 
-  const handleProgramNameChange = (e) => {
-    setProgramName(e.target.value);
+  const handleChange = (e) => {
+    if (e.target.name === "eventImage") {
+      setEvent((prevEvent) => ({
+        ...prevEvent,
+        eventImage: e.target.files[0],
+      }));
+    } else {
+      const { name, value } = e.target;
+      setEvent((prevEvent) => ({
+        ...prevEvent,
+        [name]: value,
+      }));
+    }
   };
-
-  const handleProgramDateChange = (e) => {
-    setProgramDate(e.target.value);
-  };
-
-  const handleProgramLocationChange = (e) => {
-    setProgramLocation(e.target.value);
-  };
-
-  const handleProgramDescriptionChange = (e) => {
-    setProgramDescription(e.target.value);
-  };
-
-  const handleProgramImageChange = (e) => {
-    setProgramImage(e.target.files[0]);
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Here you can perform any actions with the program information,
-    // such as submitting it to a server or storing it locally
-    const programData = {
-      name: programName,
-      date: programDate,
-      location: programLocation,
-      description: programDescription,
-      image: programImage,
-    };
-    console.log("Program Data:", programData);
-    // Close the modal after submission
+
+    try {
+      const formData = new FormData();
+      formData.append("eventImage", event.eventImage);
+      formData.append("eventName", event.eventName);
+      formData.append("eventLocation", event.eventLocation);
+      formData.append("eventDescription", event.eventDescription);
+      formData.append("eventDate", event.eventDate);
+      formData.append("eventExpiry", event.eventExpiry);
+      formData.append("foodMenu", event.foodMenu);
+      formData.append("eventsInProgram", event.eventsInProgram);
+      formData.append("ticketPrice", event.ticketPrice);
+      formData.append("paymentPerStudent", event.paymentPerStudent);
+      formData.append("numberOfTicket", event.numberOfTicket);
+      formData.append("userId", event.userId);
+
+      const res = await TokenRequest.post(`/events/v9/create`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      fetchPrograms();
+      setEvent({
+        eventName: "",
+        eventLocation: "",
+        eventDescription: "",
+        eventDate: "",
+        eventExpiry: "",
+        eventImage: null,
+        foodMenu: "",
+        eventsInProgram: "",
+        ticketPrice: "",
+        paymentPerStudent: "",
+        numberOfTicket: "",
+        userId: 1,
+      });
+    } catch (error) {
+      // Handle error
+      console.error(error);
+    }
+
     closeModal();
   };
 
   return (
     <Modal
       isOpen={isOpen}
+      ariaHideApp={false}
       onRequestClose={closeModal}
       style={{
         overlay: {
@@ -70,86 +106,199 @@ const ModalCreateProgram = ({ isOpen, closeModal }) => {
       }}
     >
       <div className="modal-header flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Create New Program</h2>{" "}
+        <h2 className="text-xl font-bold">Edit Program</h2>{" "}
         <button
           onClick={closeModal}
           className="text-blue-500 hover:text-blue-700"
         >
-          Close
+          <FaTimesCircle className="mr-1" size={20} color="red" />
         </button>
       </div>
       <div className="modal-content">
         <form onSubmit={handleSubmit}>
           <div className="form-group mb-4">
             <label
-              htmlFor="programName"
+              htmlFor="eventName"
               className="block text-sm font-medium text-gray-700"
             >
-              Program Name:
+              Event Name:
             </label>
             <input
               type="text"
-              id="programName"
-              value={programName}
-              onChange={handleProgramNameChange}
+              id="eventName"
+              name="eventName"
+              value={event.eventName}
+              onChange={handleChange}
+              required
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
           <div className="form-group mb-4">
             <label
-              htmlFor="programDate"
+              htmlFor="eventLocation"
               className="block text-sm font-medium text-gray-700"
             >
-              Program Date:
+              Event Location:
             </label>
             <input
+              required
+              type="text"
+              id="eventLocation"
+              name="eventLocation"
+              value={event.eventLocation}
+              onChange={handleChange}
+              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="eventDescription"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Event Description:
+            </label>
+            <input
+              required
+              type="text"
+              id="eventDescription"
+              name="eventDescription"
+              value={event.eventDescription}
+              onChange={handleChange}
+              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="eventDate"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Event Date:
+            </label>
+            <input
+              required
               type="date"
-              id="programDate"
-              value={programDate}
-              onChange={handleProgramDateChange}
+              id="eventDate"
+              name="eventDate"
+              value={event.eventDate}
+              onChange={handleChange}
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
           <div className="form-group mb-4">
             <label
-              htmlFor="programLocation"
+              htmlFor="eventExpiry"
               className="block text-sm font-medium text-gray-700"
             >
-              Program Location:
+              Event Expiry:
             </label>
             <input
-              type="text"
-              id="programLocation"
-              value={programLocation}
-              onChange={handleProgramLocationChange}
+              required
+              type="date"
+              id="eventExpiry"
+              name="eventExpiry"
+              value={event.eventExpiry}
+              onChange={handleChange}
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
           <div className="form-group mb-4">
             <label
-              htmlFor="programDescription"
+              htmlFor="eventImage"
               className="block text-sm font-medium text-gray-700"
             >
-              Program Description:
-            </label>
-            <textarea
-              id="programDescription"
-              value={programDescription}
-              onChange={handleProgramDescriptionChange}
-              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            ></textarea>
-          </div>
-          <div className="form-group mb-4">
-            <label
-              htmlFor="programImage"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Program Image:
+              Event Image:
             </label>
             <input
+              required
               type="file"
-              id="programImage"
-              onChange={handleProgramImageChange}
+              id="eventImage"
+              name="eventImage"
+              onChange={handleChange}
+              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="foodMenu"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Food Menu:
+            </label>
+            <input
+              required
+              type="text"
+              id="foodMenu"
+              name="foodMenu"
+              value={event.foodMenu}
+              onChange={handleChange}
+              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="eventsInProgram"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Events in Program:
+            </label>
+            <input
+              required
+              type="text"
+              id="eventsInProgram"
+              name="eventsInProgram"
+              value={event.eventsInProgram}
+              onChange={handleChange}
+              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="ticketPrice"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Ticket Price:
+            </label>
+            <input
+              required
+              type="text"
+              id="ticketPrice"
+              name="ticketPrice"
+              value={event.ticketPrice}
+              onChange={handleChange}
+              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="paymentPerStudent"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Payment per Student:
+            </label>
+            <input
+              required
+              type="text"
+              id="paymentPerStudent"
+              name="paymentPerStudent"
+              value={event.paymentPerStudent}
+              onChange={handleChange}
+              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="numberOfTicket"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Number of Ticket:
+            </label>
+            <input
+              required
+              type="text"
+              id="numberOfTicket"
+              name="numberOfTicket"
+              value={event.numberOfTicket}
+              onChange={handleChange}
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -157,7 +306,7 @@ const ModalCreateProgram = ({ isOpen, closeModal }) => {
             type="submit"
             className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
           >
-            Create Program
+            Save Changes
           </button>
         </form>
       </div>
