@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { publicRequest } from "../../RequestMethod/Request";
-import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const navigation = useNavigate();
+
   const handleUsernameChange = (event) => {
     setUsername(event.target.value);
   };

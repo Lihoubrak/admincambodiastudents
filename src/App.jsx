@@ -1,14 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import GlobalLayout from "./layouts/GlobalLayout";
 import { publicRoute } from "./Router";
 import Cookies from "js-cookie";
-
+import { SocketProvider } from "./contexts/SocketContext";
 const isAuthenticated = () => {
   const token = Cookies.get("tokenJwt");
   return !!token;
 };
-
 const App = () => {
   return (
     <BrowserRouter>
@@ -26,7 +25,9 @@ const App = () => {
                 )
               ) : isAuthenticated() ? (
                 <GlobalLayout>
-                  <route.component />
+                  <SocketProvider>
+                    <route.component />
+                  </SocketProvider>
                 </GlobalLayout>
               ) : (
                 <Navigate to="/login" replace />

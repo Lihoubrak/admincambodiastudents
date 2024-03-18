@@ -2,17 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ModalCreateUniversity } from "../../components";
 import { FaUniversity } from "react-icons/fa";
-import { publicRequest } from "../../RequestMethod/Request";
+import { TokenRequest } from "../../RequestMethod/Request";
 
 const University = () => {
-  // Static data for a university
-  const item = {
-    name: "List of University",
-    location: "Hanoi",
-    imageUrl: "src/assets/image.jpg",
-    description: "Comfortable student living",
-    establishmentYear: 1970,
-  };
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [university, setUniveresity] = useState([]);
   const openModal = () => {
@@ -23,7 +15,7 @@ const University = () => {
     setIsModalOpen(false);
   };
   const fetchAllUniversity = async () => {
-    const res = await publicRequest.get("/schools/v4/all");
+    const res = await TokenRequest.get("/schools/v4/all");
     setUniveresity(res.data);
   };
   useEffect(() => {

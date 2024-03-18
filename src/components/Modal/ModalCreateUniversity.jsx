@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Modal from "react-modal";
-import { publicRequest } from "../../RequestMethod/Request";
+import { TokenRequest, publicRequest } from "../../RequestMethod/Request";
 import { FaTimesCircle } from "react-icons/fa";
 
 const ModalCreateUniversity = ({ isOpen, closeModal, fetchAllUniversity }) => {
@@ -9,7 +9,6 @@ const ModalCreateUniversity = ({ isOpen, closeModal, fetchAllUniversity }) => {
     location: "",
     desc: "",
     image: null,
-    userId: 3,
   });
 
   const handleChange = (e) => {
@@ -36,10 +35,9 @@ const ModalCreateUniversity = ({ isOpen, closeModal, fetchAllUniversity }) => {
     formData.append("schoolLocation", universityInfo.location);
     formData.append("schoolDescription", universityInfo.desc);
     formData.append("schoolImage", universityInfo.image);
-    formData.append("userId", universityInfo.userId);
 
     try {
-      const res = await publicRequest.post(`/schools/v4/create`, formData, {
+      const res = await TokenRequest.post(`/schools/v4/create`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -49,7 +47,6 @@ const ModalCreateUniversity = ({ isOpen, closeModal, fetchAllUniversity }) => {
         location: "",
         desc: "",
         image: null,
-        userId: 1,
       });
       fetchAllUniversity();
       closeModal();

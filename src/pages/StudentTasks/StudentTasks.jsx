@@ -8,16 +8,24 @@ const StudentTasks = () => {
   const [taskContent, setTaskContent] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [type, setType] = useState("");
   const [files, setFiles] = useState([]);
   const [selectedDormUniversity, setSelectedDormUniversity] = useState();
+  const [selectType, setSelectType] = useState();
   const [dorm, setDorm] = useState([]);
-  const options = dorm.map((item) => ({
+  const [university, setUniveresity] = useState([]);
+  const optionsDorm = dorm.map((item) => ({
     label: item.dormName,
+    value: item.id,
+  }));
+  const optionsUniversity = university.map((item) => ({
+    label: item.schoolName,
     value: item.id,
   }));
   const handleChangeDormUniversity = (selectedOption) => {
     setSelectedDormUniversity(selectedOption);
+  };
+  const handleType = (TypeOption) => {
+    setSelectType(TypeOption);
   };
   const handleTaskContentChange = (content) => {
     setTaskContent(content);
@@ -37,10 +45,12 @@ const StudentTasks = () => {
       "/notifications/v15/send",
       {
         description: taskDescription,
-        conten: taskContent,
+        content: taskContent,
         file: "",
-        type: type,
-        dormId: selectedDormUniversity.value,
+        type: selectType.value,
+        notificationTo: selectedDormUniversity
+          ? selectedDormUniversity.value
+          : null,
       }
     );
     setTaskContent("");
@@ -53,6 +63,11 @@ const StudentTasks = () => {
       setDorm(res.data);
     };
     fetchDorm();
+    const fetchAllUniversity = async () => {
+      const res = await TokenRequest.get("/schools/v4/all");
+      setUniveresity(res.data);
+    };
+    fetchAllUniversity();
   }, []);
   return (
     <div>
@@ -65,9 +80,23 @@ const StudentTasks = () => {
         <Select
           value={selectedDormUniversity}
           onChange={handleChangeDormUniversity}
-          options={options}
-          defaultValue={options[0]}
-          placeholder="Select Dorm University"
+          options={optionsDorm.length > 0 ? optionsDorm : optionsUniversity}
+          defaultValue={
+            optionsDorm.length > 0 ? optionsDorm[0] : optionsUniversity[0]
+          }
+          placeholder="Select"
+          className="w-60"
+        />
+        <Select
+          value={selectType}
+          onChange={handleType}
+          options={[
+            { label: "Dormitory", value: "Dorms" },
+            { label: "University", value: "Univ" },
+            { label: "All", value: "All" },
+          ]}
+          defaultValue={{ label: "Dorms", value: "Dorms" }}
+          placeholder="Select Type"
           className="w-60"
         />
       </div>
