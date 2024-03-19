@@ -7,35 +7,32 @@ const SocketContext = createContext();
 const SocketProvider = ({ children }) => {
   const socketRef = useRef(null);
   const [onlineUsers, setOnlineUsers] = useState([]);
-  const [messages, setMessages] = useState([]);
   const TOKEN = Cookies.get("tokenJwt");
+
   useEffect(() => {
-    // Connect to the socket server when component mounts
+    if (TOKEN) {
+      // Create socket connection only if TOKEN exists
+      const socket = io("http://localhost:3000");
+      socketRef.current = socket;
 
-    socketRef.current = io("http://localhost:3000");
+      // Emit addUser event and listen for userList event
+      socket.emit("addUser", jwtDecode(TOKEN).id);
+      socket.on("userList", (users) => {
+        setOnlineUsers(users);
+      });
 
-    // Emit event to add current user to online users list
-    socketRef.current.emit("addUser", jwtDecode(TOKEN).id);
-
-    // Listen for changes in the list of online users
-    socketRef.current.on("getUsers", (users) => {
-      setOnlineUsers(users);
-    });
-    socketRef.current.on("newMessage", (newMessage) => {
-      setMessages(newMessage);
-    });
-    // Clean up function to disconnect socket when component unmounts
-    return () => {
-      socketRef.current.disconnect();
-    };
-  }, []);
+      // Clean up socket connection on component unmount
+      return () => {
+        socket.disconnect();
+      };
+    }
+  }, [TOKEN]);
 
   return (
     <SocketContext.Provider
       value={{
         socket: socketRef.current,
         onlineUsers,
-        realtimeMessage: messages,
       }}
     >
       {children}

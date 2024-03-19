@@ -10,13 +10,19 @@ const Inbox = () => {
   const [selectedSender, setSelectedSender] = useState(null);
   const [messageInput, setMessageInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const { realtimeMessage, onlineUsers } = useContext(SocketContext);
+  const { onlineUsers, socket } = useContext(SocketContext);
   const userId = getDecodeToken().id;
-  console.log(onlineUsers);
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState([]);
   const messagesEndRef = useRef(null);
-
+  useEffect(() => {
+    if (socket) {
+      socket.on("newMessage", (newMessage) => {
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
+        scrollToBottom();
+      });
+    }
+  }, [socket]);
   useEffect(() => {
     const fetchMessage = async () => {
       if (selectedSender) {
@@ -40,15 +46,10 @@ const Inbox = () => {
 
     fetchUser();
   }, []);
-  useEffect(() => {
-    if (realtimeMessage) {
-      setMessages((prevMessages) => [...prevMessages, realtimeMessage]);
-      scrollToBottom();
-    }
-  }, [realtimeMessage]);
-  const handleSelectSender = (index) => {
-    setSelectedSender(index);
+  const handleSelectSender = (id) => {
+    setSelectedSender(id);
   };
+
   const handleInputChange = (event) => {
     setMessageInput(event.target.value);
   };
@@ -59,7 +60,7 @@ const Inbox = () => {
   const handleSendMessage = async () => {
     const response = await TokenRequest.post("/messages/v16/create", {
       content: messageInput,
-      receiverId: 2,
+      receiverId: selectedSender,
     });
     setMessages((prevMessages) => [...prevMessages, response.data]);
     scrollToBottom();

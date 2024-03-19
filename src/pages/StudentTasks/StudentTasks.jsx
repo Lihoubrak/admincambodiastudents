@@ -53,6 +53,7 @@ const StudentTasks = () => {
           : null,
       }
     );
+    console.log(sendNotification.data);
     setTaskContent("");
     setTaskDescription("");
     setIsSubmitted(true);
