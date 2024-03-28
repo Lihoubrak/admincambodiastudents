@@ -20,6 +20,8 @@ import Dormitory from "./Dormitory/Dormitory";
 import DetailProgram from "./Program/DetailProgram";
 import DataStudent from "./DataStudent/DataStudent";
 import Login from "./Login/Login";
+import Sport from "./Sport/Sport";
+import DetailSport from "./Sport/DetailSport";
 
 export {
   Dormitory,
@@ -44,4 +46,6 @@ export {
   DetailProgram,
   DataStudent,
   Login,
+  Sport,
+  DetailSport,
 };

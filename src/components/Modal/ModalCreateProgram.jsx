@@ -306,7 +306,7 @@ const ModalCreateProgram = ({ isOpen, closeModal, fetchPrograms }) => {
             type="submit"
             className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
           >
-            Save Changes
+            Create Program
           </button>
         </form>
       </div>

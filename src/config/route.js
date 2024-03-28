@@ -16,9 +16,11 @@ export const configRouter = {
   detailInfoPassport: "/passport/detailpassport/:userId",
   healthcare: "/healthcare",
   electricityWater: "/electricitywater",
-  electricityLookup: "/electricity/:electricityId",
-  waterLookup: "/water/:waterId",
+  electricityLookup: "/electricity/:dormId",
+  waterLookup: "/water/:dormId",
   program: "/program",
   detailProgram: "/detailProgram/:detailProgramId",
   dataStudent: "/data",
+  sport: "/sport",
+  detailSportEvent: "detailSportEvent/:sportId",
 };

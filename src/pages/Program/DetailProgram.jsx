@@ -119,7 +119,6 @@ const DetailProgram = () => {
       ]);
       setLoading(false);
     };
-
     fetchData();
   }, [detailProgramId, selectedYear]);
 
@@ -171,85 +170,92 @@ const DetailProgram = () => {
             <GiGlassCelebration size={70} />
             <span>PROGRAM</span>
           </h1>
-          <div className="flex flex-col w-full bg-gray-200 p-6 rounded-md shadow-md mb-8">
-            <div className="flex justify-around  mb-6">
-              <div className="flex">
-                <h2 className="text-xl font-bold text-red-600">
-                  <FaUtensilSpoon className="inline-block mr-2" />
+          <div class="container bg-white p-6 rounded-lg shadow-lg mb-8">
+            <div class="flex justify-between items-center mb-6">
+              <div>
+                <h2 class="text-xl font-bold text-blue-600 flex items-center">
+                  <FaUtensilSpoon class="inline-block mr-2 text-blue-600" />
                   Food Menu
                 </h2>
-                <ul className="pl-6 space-y-2">
+                <ul class="pl-6 space-y-2">
                   <li>{event?.foodMenu}</li>
                   <li>{event?.foodMenu}</li>
                   <li>{event?.foodMenu}</li>
                 </ul>
               </div>
-              <div className="flex">
-                <h2 className="text-xl font-bold text-red-600">
-                  <FaCalendar className="inline-block mr-2" />
+              <div>
+                <h2 class="text-xl font-bold text-indigo-600 flex items-center">
+                  <FaCalendar class="inline-block mr-2 text-indigo-600" />
                   Events in Program
                 </h2>
-                <ul className="pl-6 space-y-2">
+                <ul class="pl-6 space-y-2">
                   <li>{event?.eventsInProgram}</li>
                   <li>{event?.eventsInProgram}</li>
                   <li>{event?.eventsInProgram}</li>
                 </ul>
               </div>
             </div>
-            <div className="flex justify-around">
-              <div className="flex flex-col space-y-2">
-                <div className="flex items-center">
-                  <FaDollarSign className="text-red-600 mr-2" />
-                  <span className="font-bold">Ticket Price:</span>
-                  <span className="pl-2">{event?.ticketPrice}</span>
+            <div class="flex justify-between">
+              <div class="flex flex-col space-y-2">
+                <div class="flex items-center">
+                  <FaDollarSign class="text-red-600 mr-2" />
+                  <span class="font-bold text-gray-700">Ticket Price:</span>
+                  <span class="pl-2">{event?.ticketPrice}</span>
                 </div>
-                <div className="flex items-center">
-                  <FaDollarSign className="text-red-600 mr-2" />
-                  <span className="font-bold">Payment Per Student:</span>
-                  <span className="pl-2">{event?.paymentPerStudent}</span>
+                <div class="flex items-center">
+                  <FaDollarSign class="text-red-600 mr-2" />
+                  <span class="font-bold text-gray-700">
+                    Payment Per Student:
+                  </span>
+                  <span class="pl-2">{event?.paymentPerStudent}</span>
                 </div>
-                <div className="flex items-center">
-                  <FaDollarSign className="text-red-600 mr-2" />
-                  <span className="font-bold">Number of Tickets:</span>
-                  <span className="pl-2">{event?.numberOfTicket}</span>
+                <div class="flex items-center">
+                  <FaDollarSign class="text-red-600 mr-2" />
+                  <span class="font-bold text-gray-700">
+                    Number of Tickets:
+                  </span>
+                  <span class="pl-2">{event?.numberOfTicket}</span>
                 </div>
-                <div className="flex items-center">
-                  <FaCalendarAlt className="text-red-600 mr-2" />
-                  <span className="font-bold">Event Date:</span>
-                  <span className="pl-2">{event?.eventDate}</span>
+                <div class="flex items-center">
+                  <FaCalendarAlt class="text-red-600 mr-2" />
+                  <span class="font-bold text-gray-700">Event Date:</span>
+                  <span class="pl-2">{event?.eventDate}</span>
                 </div>
               </div>
-              <div className="flex flex-col space-y-2">
-                <div className="flex items-center">
-                  <FaMapMarkerAlt className="text-red-600 mr-2" />
-                  <span className="font-bold">Event Name:</span>
-                  <span className="pl-2">{event?.eventName}</span>
+              <div class="flex flex-col space-y-2">
+                <div class="flex items-center">
+                  <FaMapMarkerAlt class="text-red-600 mr-2" />
+                  <span class="font-bold text-gray-700">Event Name:</span>
+                  <span class="pl-2">{event?.eventName}</span>
                 </div>
-                <div className="flex items-center">
-                  <FaMapMarkerAlt className="text-red-600 mr-2" />
-                  <span className="font-bold">Event Location:</span>
-                  <span className="pl-2">{event?.eventLocation}</span>
+                <div class="flex items-center">
+                  <FaMapMarkerAlt class="text-red-600 mr-2" />
+                  <span class="font-bold text-gray-700">Event Location:</span>
+                  <span class="pl-2">{event?.eventLocation}</span>
                 </div>
-                <div className="flex items-center">
-                  <FaMapMarkerAlt className="text-red-600 mr-2" />
-                  <span className="font-bold">Event Description:</span>
-                  <span className="pl-2">{event?.eventDescription}</span>
+                <div class="flex items-center">
+                  <FaMapMarkerAlt class="text-red-600 mr-2" />
+                  <span class="font-bold text-gray-700">
+                    Event Description:
+                  </span>
+                  <span class="pl-2">{event?.eventDescription}</span>
                 </div>
-                <div className="flex items-center">
-                  <FaCalendarAlt className="text-red-600 mr-2" />
-                  <span className="font-bold">Event Expiry:</span>
-                  <span className="pl-2">{event?.eventExpiry}</span>
+                <div class="flex items-center">
+                  <FaCalendarAlt class="text-red-600 mr-2" />
+                  <span class="font-bold text-gray-700">Event Expiry:</span>
+                  <span class="pl-2">{event?.eventExpiry}</span>
                 </div>
               </div>
             </div>
             <button
               onClick={() => setIsModalOpenEdit(true)}
-              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
             >
-              <FaEdit className="inline-block mr-2" />
+              <FaEdit class="inline-block mr-2" />
               Edit
             </button>
           </div>
+
           <div className="flex">
             <Select
               value={yearOptions.find(

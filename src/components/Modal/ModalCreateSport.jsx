@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import Modal from "react-modal";
 import { FaTimesCircle } from "react-icons/fa";
+import Modal from "react-modal";
+
 const ModalCreateSport = ({ isOpen, closeModal, createSportEvent }) => {
-  const [eventName, setEventName] = useState("");
+  const [sportEvent, setSportEvent] = useState("");
   const [eventDate, setEventDate] = useState("");
   const [eventLocation, setEventLocation] = useState("");
   const [eventDescription, setEventDescription] = useState("");
@@ -11,7 +12,7 @@ const ModalCreateSport = ({ isOpen, closeModal, createSportEvent }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const newSportEvent = {
-      eventName,
+      sportEvent,
       eventDate,
       eventLocation,
       eventDescription,
@@ -50,7 +51,7 @@ const ModalCreateSport = ({ isOpen, closeModal, createSportEvent }) => {
         <h2 className="text-2xl font-bold">Create Sport Event</h2>
         <button
           onClick={closeModal}
-          className="text-blue-500 hover:text-blue-700"
+          className="text-blue-500 hover:text-blue-700 "
         >
           <FaTimesCircle className="mr-1" size={20} color="red" />
         </button>
@@ -58,14 +59,14 @@ const ModalCreateSport = ({ isOpen, closeModal, createSportEvent }) => {
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label htmlFor="eventName" className="block mb-2">
-            Event Name:
+            Sport Name:
           </label>
           <input
             type="text"
-            id="eventName"
-            value={eventName}
-            onChange={(e) => setEventName(e.target.value)}
-            className="w-full border border-gray-300 rounded px-3 py-2"
+            id="sportEvent"
+            value={sportEvent}
+            onChange={(e) => setSportEvent(e.target.value)}
+            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             required
           />
         </div>
@@ -78,7 +79,7 @@ const ModalCreateSport = ({ isOpen, closeModal, createSportEvent }) => {
             id="eventDate"
             value={eventDate}
             onChange={(e) => setEventDate(e.target.value)}
-            className="w-full border border-gray-300 rounded px-3 py-2"
+            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             required
           />
         </div>
@@ -91,7 +92,7 @@ const ModalCreateSport = ({ isOpen, closeModal, createSportEvent }) => {
             id="eventLocation"
             value={eventLocation}
             onChange={(e) => setEventLocation(e.target.value)}
-            className="w-full border border-gray-300 rounded px-3 py-2"
+            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             required
           />
         </div>
@@ -103,7 +104,7 @@ const ModalCreateSport = ({ isOpen, closeModal, createSportEvent }) => {
             id="eventDescription"
             value={eventDescription}
             onChange={(e) => setEventDescription(e.target.value)}
-            className="w-full border border-gray-300 rounded px-3 py-2"
+            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             required
           ></textarea>
         </div>
@@ -112,27 +113,20 @@ const ModalCreateSport = ({ isOpen, closeModal, createSportEvent }) => {
             Event Image URL:
           </label>
           <input
-            type="text"
+            type="file"
             id="eventImage"
             value={eventImage}
             onChange={(e) => setEventImage(e.target.value)}
-            className="w-full border border-gray-300 rounded px-3 py-2"
+            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             required
           />
         </div>
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={closeModal}
-            className="px-4 py-2 bg-gray-300 text-gray-800 rounded mr-2"
-          >
-            Cancel
-          </button>
+        <div className="flex justify-start">
           <button
             type="submit"
             className="px-4 py-2 bg-blue-600 text-white rounded"
           >
-            Create
+            Create Sport
           </button>
         </div>
       </form>

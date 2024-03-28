@@ -5,6 +5,7 @@ import { FaDownload, FaHandHoldingWater } from "react-icons/fa";
 import { TokenRequest, publicRequest } from "../../RequestMethod/Request";
 import { utils, writeFile } from "xlsx";
 import Select from "react-select";
+import { useParams } from "react-router-dom";
 
 const WaterLookup = () => {
   const [room, setRoom] = useState([]);
@@ -14,6 +15,7 @@ const WaterLookup = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const currentYear = new Date().getFullYear();
+  const { dormId } = useParams();
   const month = new Date().getMonth() + 1;
   const optionValue = `${month}/${currentYear}`;
   const today = new Date();
@@ -48,7 +50,7 @@ const WaterLookup = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const roomRes = await TokenRequest.get(`/rooms/v3/all`);
+        const roomRes = await TokenRequest.get(`/rooms/v3/all/${dormId}`);
         setRoom(roomRes.data);
         setLoading(false);
         setError(null);

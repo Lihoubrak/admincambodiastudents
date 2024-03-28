@@ -1,35 +1,32 @@
-import React, { useEffect, useState } from "react";
-import { GiGlassCelebration } from "react-icons/gi";
+import React, { useState } from "react";
+import { GiSoccerBall } from "react-icons/gi"; // Change icon to a sports-related one
 import { Link } from "react-router-dom";
-import { TokenRequest } from "../../RequestMethod/Request";
-import { ModalCreateProgram } from "../../components";
+import { ModalCreateSport } from "../../components";
 
-const Program = () => {
+const Sport = () => {
+  const [sportsEvents, setSportsEvents] = useState([
+    {
+      id: 1,
+      eventName: "Football Match",
+      eventDate: "2024-03-25",
+      eventLocation: "Stadium ABC",
+      eventDescription: "Exciting football match between Team A and Team B",
+      eventImage: "https://example.com/football-match-image.jpg",
+    },
+    {
+      id: 2,
+      eventName: "Basketball Tournament",
+      eventDate: "2024-04-10",
+      eventLocation: "Indoor Arena XYZ",
+      eventDescription:
+        "Basketball tournament featuring top teams from the region",
+      eventImage: "https://example.com/basketball-tournament-image.jpg",
+    },
+    // Add more sample events as needed
+  ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [programs, setPrograms] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
-
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
-  const fetchPrograms = async () => {
-    try {
-      const res = await TokenRequest.get("/events/v9/all");
-      setPrograms(res.data);
-    } catch (error) {
-      console.error("Error fetching programs:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchPrograms();
-  }, []);
 
   // Function to handle filtering by year
   const handleFilterByYear = (year) => {
@@ -43,17 +40,23 @@ const Program = () => {
     console.log("Searching for:", searchTerm);
   };
 
-  // Filter programs based on selected year
-  const filteredPrograms = selectedYear
-    ? programs.filter((program) => program.eventDate.startsWith(selectedYear))
-    : programs;
+  // Filter sports events based on selected year
+  const filteredEvents = selectedYear
+    ? sportsEvents.filter((event) => event.eventDate.startsWith(selectedYear))
+    : sportsEvents;
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
 
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
   return (
     <div>
       <div className="flex justify-between items-center">
         <h1 className="text-4xl gap-3 flex justify-center items-center font-bold mb-8 text-center text-blue-600">
-          <GiGlassCelebration size={70} />
-          <span>PROGRAM</span>
+          <GiSoccerBall size={50} />
+          <span>SPORT EVENTS</span>
         </h1>
         <div className="flex gap-4">
           <input
@@ -87,32 +90,31 @@ const Program = () => {
           onClick={openModal}
           className="min-w-[200px] font-bold text-white py-2 cursor-pointer rounded overflow-hidden shadow-md border-2 border-blue-600 flex items-center justify-center bg-blue-600 hover:bg-blue-700 transition duration-300"
         >
-          Create New Program
+          Create New Sport Event
         </button>
       </div>
       <div className="flex flex-wrap gap-8 justify-center">
-        {/* Display program cards */}
-        {filteredPrograms.map((program) => (
+        {filteredEvents.map((event) => (
           <Link
-            to={`/detailProgram/${program.id}`}
-            key={program.id}
+            to={`/detailSportEvent/${event.id}`}
+            key={event.id}
             className="w-full max-w-[300px]"
           >
             <div className="cursor-pointer rounded-lg overflow-hidden shadow-lg bg-white hover:shadow-xl transition duration-300">
               <img
                 className="w-full h-48 object-cover"
-                src={program.eventImage}
-                alt={program.eventName}
+                src={event.eventImage}
+                alt={event.eventName}
               />
               <div className="px-6 py-4">
                 <div className="text-center">
                   <h1 className="font-bold text-xl mb-2 text-blue-500">
-                    {program.eventName}
+                    {event.eventName}
                   </h1>
-                  <p className="text-gray-700">{program.eventDate}</p>
-                  <p className="text-gray-700">{program.eventLocation}</p>
+                  <p className="text-gray-700">{event.eventDate}</p>
+                  <p className="text-gray-700">{event.eventLocation}</p>
                   <p className="text-sm text-gray-500 mb-2">
-                    {program.eventDescription}
+                    {event.eventDescription}
                   </p>
                 </div>
               </div>
@@ -120,13 +122,9 @@ const Program = () => {
           </Link>
         ))}
       </div>
-      <ModalCreateProgram
-        isOpen={isModalOpen}
-        closeModal={closeModal}
-        fetchPrograms={fetchPrograms}
-      />
+      <ModalCreateSport isOpen={isModalOpen} closeModal={closeModal} />
     </div>
   );
 };
 
-export default Program;
+export default Sport;

@@ -1,11 +1,18 @@
-// Import các thư viện và biến React
-import React, { useContext, useState, useEffect, useMemo, useRef } from "react";
+import React, {
+  useContext,
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  useCallback,
+} from "react";
 import { MdForwardToInbox } from "react-icons/md";
-import { TokenRequest, publicRequest } from "../../RequestMethod/Request";
+import { TokenRequest } from "../../RequestMethod/Request";
 import { SocketContext } from "../../contexts/SocketContext";
 import { getDecodeToken } from "../../utils/getDecodeToken";
 import { formatDateTime } from "../../utils/formatDateTime";
 import { TiMediaRecord } from "react-icons/ti";
+
 const Inbox = () => {
   const [selectedSender, setSelectedSender] = useState(null);
   const [messageInput, setMessageInput] = useState("");
@@ -15,14 +22,48 @@ const Inbox = () => {
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState([]);
   const messagesEndRef = useRef(null);
+
+  const handleSelectSender = useCallback((id) => {
+    setSelectedSender(id);
+  }, []);
+
+  const handleInputChange = useCallback((event) => {
+    setMessageInput(event.target.value);
+  }, []);
+
+  const handleSearchInputChange = useCallback((event) => {
+    setSearchQuery(event.target.value);
+  }, []);
+
+  const handleSendMessage = useCallback(async () => {
+    const response = await TokenRequest.post("/messages/v16/create", {
+      content: messageInput,
+      receiverId: selectedSender,
+    });
+    setMessages((prevMessages) => [...prevMessages, response.data]);
+    setMessageInput("");
+  }, [messageInput, selectedSender]);
+
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "end",
+    });
+  }, [messages]);
+
   useEffect(() => {
     if (socket) {
-      socket.on("newMessage", (newMessage) => {
+      const handleNewMessage = (newMessage) => {
         setMessages((prevMessages) => [...prevMessages, newMessage]);
         scrollToBottom();
-      });
+      };
+      socket.on("newMessage", handleNewMessage);
+      return () => {
+        socket.off("newMessage", handleNewMessage);
+      };
     }
-  }, [socket]);
+  }, [socket, scrollToBottom]);
+
   useEffect(() => {
     const fetchMessage = async () => {
       if (selectedSender) {
@@ -30,48 +71,19 @@ const Inbox = () => {
           `/messages/v16/all/${selectedSender}`
         );
         setMessages(res.data);
-        scrollToBottom();
       }
     };
     fetchMessage();
+    scrollToBottom();
   }, [selectedSender]);
 
   useEffect(() => {
     const fetchUser = async () => {
-      if (userId) {
-        const res = await publicRequest.get(`/users/v1/all/${userId}`);
-        setUsers(res.data);
-      }
+      const res = await TokenRequest.get(`/users/v1/all`);
+      setUsers(res.data);
     };
-
     fetchUser();
   }, []);
-  const handleSelectSender = (id) => {
-    setSelectedSender(id);
-  };
-
-  const handleInputChange = (event) => {
-    setMessageInput(event.target.value);
-  };
-  const handleSearchInputChange = (event) => {
-    setSearchQuery(event.target.value);
-  };
-
-  const handleSendMessage = async () => {
-    const response = await TokenRequest.post("/messages/v16/create", {
-      content: messageInput,
-      receiverId: selectedSender,
-    });
-    setMessages((prevMessages) => [...prevMessages, response.data]);
-    scrollToBottom();
-    setMessageInput("");
-  };
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "end",
-    });
-  };
 
   const filteredUsers = useMemo(() => {
     return users.filter(
@@ -80,7 +92,6 @@ const Inbox = () => {
         user.lastName.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [searchQuery, users]);
-
   return (
     <div className="container mx-auto">
       <h1 className="text-4xl flex items-center justify-center font-bold mb-8 text-blue-600">

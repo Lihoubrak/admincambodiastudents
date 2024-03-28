@@ -12,31 +12,83 @@ import {
   FaBolt,
   FaDatabase,
 } from "react-icons/fa";
-import { GiGlassCelebration } from "react-icons/gi";
-import logo from "../assets/logo.png"; // Import the logo image
-
-const sidebarLinks = [
-  { icon: <FaUser size={25} />, label: "University", to: "/" },
-  { icon: <FaBed size={25} />, label: "Dormitory", to: "/dormitory" },
-  { icon: <FaInbox size={25} />, label: "Inbox", to: "/inbox" },
-  {
-    icon: <FaMoneyBill size={25} />,
-    label: "Scholarships",
-    to: "/scholarships",
-  },
-  { icon: <FaTasks size={25} />, label: "Student Tasks", to: "/tasks" },
-  { icon: <FaPassport size={25} />, label: "Passport", to: "/passport" },
-  { icon: <FaHospital size={25} />, label: "Healthcare", to: "/healthcare" },
-  {
-    icon: <FaBolt size={25} />,
-    label: "Electricity Water",
-    to: "/electricitywater",
-  },
-  { icon: <GiGlassCelebration size={30} />, label: "Program", to: "/program" },
-  { icon: <FaDatabase size={25} />, label: "Import & Export", to: "/data" },
-];
-
+import { GiGlassCelebration, GiSoccerBall } from "react-icons/gi";
+import logo from "../assets/logo.png";
+import { useAuth } from "../contexts/AuthContext";
+import { TbPlayFootball } from "react-icons/tb";
 const Sidebar = ({ isSidebarOpen }) => {
+  const { userRole } = useAuth();
+  const getSidebarLinks = () => {
+    if (userRole === "KTX") {
+      return [
+        { icon: <FaBed size={25} />, label: "Dormitory", to: "/" },
+        { icon: <FaInbox size={25} />, label: "Inbox", to: "/inbox" },
+        { icon: <FaTasks size={25} />, label: "Student Tasks", to: "/tasks" },
+        {
+          icon: <FaMoneyBill size={25} />,
+          label: "Scholarships",
+          to: "/scholarships",
+        },
+
+        { icon: <FaPassport size={25} />, label: "Passport", to: "/passport" },
+        // {
+        //   icon: <FaHospital size={25} />,
+        //   label: "Healthcare",
+        //   to: "/healthcare",
+        // },
+        {
+          icon: <FaBolt size={25} />,
+          label: "Electricity Water",
+          to: "/electricitywater",
+        },
+        {
+          icon: <GiGlassCelebration size={30} />,
+          label: "Program",
+          to: "/program",
+        },
+        {
+          icon: <GiSoccerBall size={30} />,
+          label: "Sport",
+          to: "/sport",
+        },
+        {
+          icon: <FaDatabase size={25} />,
+          label: "Import & Export",
+          to: "/data",
+        },
+      ];
+    } else if (userRole === "SCH") {
+      return [
+        { icon: <FaUser size={25} />, label: "University", to: "/" },
+        { icon: <FaInbox size={25} />, label: "Inbox", to: "/inbox" },
+        { icon: <FaTasks size={25} />, label: "Student Tasks", to: "/tasks" },
+        // {
+        //   icon: <FaHospital size={25} />,
+        //   label: "Healthcare",
+        //   to: "/healthcare",
+        // },
+        {
+          icon: <GiGlassCelebration size={30} />,
+          label: "Program",
+          to: "/program",
+        },
+        {
+          icon: <GiSoccerBall size={30} />,
+          label: "Sport",
+          to: "/sport",
+        },
+        {
+          icon: <FaDatabase size={25} />,
+          label: "Import & Export",
+          to: "/data",
+        },
+      ];
+    } else {
+      return [];
+    }
+  };
+
+  const sidebarLinks = getSidebarLinks();
   return (
     <div
       className={`py-5 bg-gray-900 min-h-screen flex flex-col border-r-2 overflow-hidden `}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Modal from "react-modal";
 import { FaTimesCircle } from "react-icons/fa";
-import { publicRequest } from "../../RequestMethod/Request";
+import { TokenRequest, publicRequest } from "../../RequestMethod/Request";
 
 const ModalEditStudent = ({
   isModalOpen,
@@ -15,7 +15,7 @@ const ModalEditStudent = ({
   useEffect(() => {
     const fetchAllStudents = async () => {
       try {
-        const res = await publicRequest.get("/users/v1/all");
+        const res = await TokenRequest.get("/users/v1/all");
         const filteredStudents = res.data.filter(
           (student) => student.id !== studentId
         );

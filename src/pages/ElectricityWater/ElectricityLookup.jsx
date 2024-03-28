@@ -6,6 +6,7 @@ import { TokenRequest, publicRequest } from "../../RequestMethod/Request";
 import { utils, writeFile } from "xlsx";
 import Select from "react-select";
 import { GiElectricalResistance } from "react-icons/gi";
+import { useParams } from "react-router-dom";
 
 const ElectricityLookup = () => {
   const [room, setRoom] = useState([]);
@@ -14,6 +15,7 @@ const ElectricityLookup = () => {
   const [selectedMonth, setSelectedMonth] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { dormId } = useParams();
   const currentYear = new Date().getFullYear();
   const month = new Date().getMonth() + 1;
   const today = new Date();
@@ -48,7 +50,7 @@ const ElectricityLookup = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const roomRes = await TokenRequest.get(`/rooms/v3/all`);
+        const roomRes = await TokenRequest.get(`/rooms/v3/all/${dormId}`);
         setRoom(roomRes.data);
         setLoading(false);
         setError(null);

@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { FaTasks } from "react-icons/fa";
-import { TokenRequest, publicRequest } from "../../RequestMethod/Request";
+import { TokenRequest } from "../../RequestMethod/Request";
 import Select from "react-select";
+
 const StudentTasks = () => {
   const [taskContent, setTaskContent] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
@@ -13,34 +14,29 @@ const StudentTasks = () => {
   const [selectType, setSelectType] = useState();
   const [dorm, setDorm] = useState([]);
   const [university, setUniveresity] = useState([]);
-  const optionsDorm = dorm.map((item) => ({
-    label: item.dormName,
-    value: item.id,
-  }));
-  const optionsUniversity = university.map((item) => ({
-    label: item.schoolName,
-    value: item.id,
-  }));
-  const handleChangeDormUniversity = (selectedOption) => {
+
+  const handleChangeDormUniversity = useCallback((selectedOption) => {
     setSelectedDormUniversity(selectedOption);
-  };
-  const handleType = (TypeOption) => {
+  }, []);
+
+  const handleType = useCallback((TypeOption) => {
     setSelectType(TypeOption);
-  };
-  const handleTaskContentChange = (content) => {
+  }, []);
+
+  const handleTaskContentChange = useCallback((content) => {
     setTaskContent(content);
-  };
+  }, []);
 
-  const handleTaskDescriptionChange = (e) => {
+  const handleTaskDescriptionChange = useCallback((e) => {
     setTaskDescription(e.target.value);
-  };
+  }, []);
 
-  const handleFileUpload = (event) => {
+  const handleFileUpload = useCallback((event) => {
     const uploadedFiles = Array.from(event.target.files);
     setFiles(uploadedFiles);
-  };
+  }, []);
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     const sendNotification = await TokenRequest.post(
       "/notifications/v15/send",
       {
@@ -57,7 +53,8 @@ const StudentTasks = () => {
     setTaskContent("");
     setTaskDescription("");
     setIsSubmitted(true);
-  };
+  }, [taskDescription, taskContent, selectType, selectedDormUniversity]);
+
   useEffect(() => {
     const fetchDorm = async () => {
       const res = await TokenRequest.get("/dorms/v2/all");
@@ -70,6 +67,25 @@ const StudentTasks = () => {
     };
     fetchAllUniversity();
   }, []);
+
+  const optionsDorm = useMemo(
+    () =>
+      dorm.map((item) => ({
+        label: item.dormName,
+        value: item.id,
+      })),
+    [dorm]
+  );
+
+  const optionsUniversity = useMemo(
+    () =>
+      university.map((item) => ({
+        label: item.schoolName,
+        value: item.id,
+      })),
+    [university]
+  );
+
   return (
     <div>
       <h1 className="text-4xl gap-3 flex justify-center items-center font-bold mb-8 text-center text-blue-600">

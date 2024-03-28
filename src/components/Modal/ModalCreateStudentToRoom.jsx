@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Modal from "react-modal";
 import { FaTimesCircle } from "react-icons/fa";
-import { publicRequest } from "../../RequestMethod/Request";
+import { TokenRequest, publicRequest } from "../../RequestMethod/Request";
 
 const ModalCreateStudentToRoom = ({
   setIsAddStudent,
@@ -14,7 +14,7 @@ const ModalCreateStudentToRoom = ({
   useEffect(() => {
     const fetchAllStudents = async () => {
       try {
-        const res = await publicRequest.get("/users/v1/all");
+        const res = await TokenRequest.get("/users/v1/all");
         setStudents(res.data);
       } catch (error) {
         console.error("Error fetching students:", error);

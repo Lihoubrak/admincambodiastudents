@@ -25,6 +25,7 @@ import TableJoinProgram from "./Table/TableJoinProgram";
 import TableProductProgram from "./Table/TableProductProgram";
 import TableSupportProgram from "./Table/TableSupportProgram";
 import ModalCreateStudentToRoom from "./Modal/ModalCreateStudentToRoom";
+import ModalCreateSport from "./Modal/ModalCreateSport";
 
 export {
   ModalCreateRoom,
@@ -54,4 +55,5 @@ export {
   TableProductProgram,
   TableSupportProgram,
   ModalCreateStudentToRoom,
+  ModalCreateSport,
 };
