@@ -5,7 +5,6 @@ import Healthcare from "./Healthcare/Healthcare";
 import Inbox from "./Inbox/Inbox";
 import DetailInfoPassport from "./Passport/DetailInfoPassport";
 import DetailPassport from "./Passport/DetailPassport";
-import DetailInfoVisa from "./Passport/DetailInfoVisa";
 import Passport from "./Passport/Passport";
 import Scholarships from "./Scholarships/Scholarships";
 import DetailRoom from "./StudentRoom/DetailRoom";
@@ -22,6 +21,9 @@ import DataStudent from "./DataStudent/DataStudent";
 import Login from "./Login/Login";
 import Sport from "./Sport/Sport";
 import DetailSport from "./Sport/DetailSport";
+import DetailTeam from "./Sport/DetailTeam";
+import ProfileUser from "./ProfileUser/ProfileUser";
+import Notification from "./Notification/Notification";
 
 export {
   Dormitory,
@@ -40,7 +42,6 @@ export {
   ElectricityWater,
   WaterLookup,
   DetailPassport,
-  DetailInfoVisa,
   DetailInfoPassport,
   Program,
   DetailProgram,
@@ -48,4 +49,7 @@ export {
   Login,
   Sport,
   DetailSport,
+  DetailTeam,
+  ProfileUser,
+  Notification,
 };

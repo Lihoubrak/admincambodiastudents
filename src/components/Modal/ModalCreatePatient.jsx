@@ -11,7 +11,7 @@ const ModalCreatePatient = ({ isOpen, closeModal, fetchPatients }) => {
     discount: "",
     hospital: "",
     typeofDisease: "",
-    userId: 3,
+    userId: "",
   });
 
   const handleChange = (e) => {

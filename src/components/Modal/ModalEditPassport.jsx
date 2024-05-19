@@ -35,6 +35,7 @@ const ModalEditPassport = ({ isOpen, closeModal }) => {
   return (
     <Modal
       isOpen={isOpen}
+      ariaHideApp={false}
       onRequestClose={closeModal}
       style={{
         overlay: {

@@ -27,7 +27,6 @@ const ElectricityLookup = () => {
     support: 60,
     pricePerKwh: 2120.0,
   });
-
   const fetchElectrical = async () => {
     try {
       setLoading(true);
@@ -75,7 +74,7 @@ const ElectricityLookup = () => {
       pricePerKwh: formData.pricePerKwh,
       support: formData.support,
       date: formData.date,
-      roomId: parseInt(room),
+      roomId: room,
     };
 
     try {
@@ -92,6 +91,7 @@ const ElectricityLookup = () => {
       });
     } catch (error) {
       setError(error.response?.data?.error || "Error submitting data");
+      console.log(error);
     }
   };
   const handleChange = (e) => {
@@ -115,18 +115,26 @@ const ElectricityLookup = () => {
     { field: "totalAmount", headerName: "Total Amount", width: 150 },
   ];
 
-  const formattedData = electricity.map((item, index) => ({
-    id: index + 1,
-    date: item.date,
-    room: item.Room.roomNumber,
-    oldIndex: item.oldIndex,
-    newIndex: item.newIndex,
-    totalConsumption: item.totalConsumption,
-    support: item.support,
-    exceedLimit: item.exceedLimit,
-    pricePerKwh: item.pricePerKwh,
-    totalAmount: item.totalAmount,
-  }));
+  const formattedData = electricity.map((item, index) => {
+    const timestamp = item.date;
+    const date = new Date(timestamp._seconds * 1000); // Convert seconds to milliseconds
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Add leading zero if needed
+    const day = String(date.getDate()).padStart(2, "0"); // Add leading zero if needed
+    const dateString = `${year}-${month}-${day}`;
+    return {
+      id: index + 1,
+      date: dateString,
+      room: item.Room.roomNumber,
+      oldIndex: item.oldIndex,
+      newIndex: item.newIndex,
+      totalConsumption: item.totalConsumption,
+      support: item.support,
+      exceedLimit: item.exceedLimit,
+      pricePerKwh: item.pricePerKwh,
+      totalAmount: item.totalAmount,
+    };
+  });
 
   const exportFile = useCallback(() => {
     const ws = utils.json_to_sheet(formattedData);

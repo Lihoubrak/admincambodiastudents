@@ -4,7 +4,7 @@ import "react-quill/dist/quill.snow.css";
 import { FaTasks } from "react-icons/fa";
 import { TokenRequest } from "../../RequestMethod/Request";
 import Select from "react-select";
-
+import { getUserRole } from "../../utils/getUserRole";
 const StudentTasks = () => {
   const [taskContent, setTaskContent] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
@@ -14,7 +14,7 @@ const StudentTasks = () => {
   const [selectType, setSelectType] = useState();
   const [dorm, setDorm] = useState([]);
   const [university, setUniveresity] = useState([]);
-
+  const role = getUserRole();
   const handleChangeDormUniversity = useCallback((selectedOption) => {
     setSelectedDormUniversity(selectedOption);
   }, []);
@@ -36,36 +36,47 @@ const StudentTasks = () => {
     setFiles(uploadedFiles);
   }, []);
 
-  const handleSubmit = useCallback(async () => {
-    const sendNotification = await TokenRequest.post(
-      "/notifications/v15/send",
-      {
-        description: taskDescription,
-        content: taskContent,
-        file: "",
-        type: selectType.value,
-        notificationTo: selectedDormUniversity
-          ? selectedDormUniversity.value
-          : null,
-      }
-    );
-    console.log(sendNotification.data);
-    setTaskContent("");
-    setTaskDescription("");
-    setIsSubmitted(true);
-  }, [taskDescription, taskContent, selectType, selectedDormUniversity]);
+  const handleSubmit = async () => {
+    try {
+      const sendNotification = await TokenRequest.post(
+        "/notifications/v15/send",
+        {
+          description: taskDescription,
+          content: taskContent,
+          file: "",
+          type: selectType.value,
+          notificationTo: selectedDormUniversity
+            ? selectedDormUniversity.value
+            : null,
+        }
+      );
+
+      setTaskContent("");
+      setTaskDescription("");
+      setIsSubmitted(true);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
     const fetchDorm = async () => {
       const res = await TokenRequest.get("/dorms/v2/all");
       setDorm(res.data);
     };
-    fetchDorm();
+
     const fetchAllUniversity = async () => {
       const res = await TokenRequest.get("/schools/v4/all");
       setUniveresity(res.data);
     };
-    fetchAllUniversity();
+    if (role === "KTX") {
+      fetchDorm();
+    } else if (role === "SCH") {
+      fetchAllUniversity();
+    } else {
+      fetchDorm();
+      fetchAllUniversity();
+    }
   }, []);
 
   const optionsDorm = useMemo(
@@ -97,10 +108,7 @@ const StudentTasks = () => {
         <Select
           value={selectedDormUniversity}
           onChange={handleChangeDormUniversity}
-          options={optionsDorm.length > 0 ? optionsDorm : optionsUniversity}
-          defaultValue={
-            optionsDorm.length > 0 ? optionsDorm[0] : optionsUniversity[0]
-          }
+          options={[...optionsDorm, ...optionsUniversity]}
           placeholder="Select"
           className="w-60"
         />
@@ -172,6 +180,7 @@ const StudentTasks = () => {
       >
         Submit Task
       </button>
+
       {isSubmitted && (
         <p className="text-green-500 mt-4">Task submitted successfully!</p>
       )}

@@ -13,15 +13,20 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Select from "react-select";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { publicRequest } from "../../RequestMethod/Request";
-import { FaInfoCircle, FaTrash } from "react-icons/fa";
+import { FaInfoCircle, FaPlus, FaTrash } from "react-icons/fa";
+import { ModalCreateStudentToMajor } from "../../components";
+import { doc } from "firebase/firestore";
+import { db } from "../../firebase/firebase";
 
 const DetailMajor = () => {
   const [selectedYear, setSelectedYear] = useState(null);
   const [student, setStudent] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isAddStudent, setIsAddStudent] = useState(false);
   const { majorId } = useParams();
   const navigation = useNavigate();
+  console.log("student", student);
   useEffect(() => {
     const fetchAllStudent = async () => {
       setLoading(true);
@@ -63,11 +68,41 @@ const DetailMajor = () => {
     { value: 2023, label: "2023" },
     // Add more years as needed
   ];
-  const handleDelete = (id) => {};
+
+  const handleDelete = async (id) => {
+    try {
+      // Call API to remove the MajorId from the student
+      await publicRequest.put(`/majors/v5/removemajor/${id}`);
+      setStudent((prevStudents) => {
+        return prevStudents.filter((student) => student.id !== id);
+      });
+      alert("Major removed from the student successfully.");
+    } catch (error) {
+      console.error("Error removing major from student:", error);
+    }
+  };
+
   const handleDetail = (id) => {
-    console.log(id);
     navigation(`/university/student/${id}`);
   };
+
+  const handleGraduatedChange = async (e, id) => {
+    const newValue = e.target.value === "Yes" ? true : false;
+    try {
+      await publicRequest.put(`/majors/v5/updategraduated`, {
+        studentId: id,
+        graduated: newValue,
+      });
+      setStudent((prevStudent) =>
+        prevStudent.map((student) =>
+          student.id === id ? { ...student, graduated: newValue } : student
+        )
+      );
+    } catch (error) {
+      console.error("Error updating graduated status:", error);
+    }
+  };
+
   const columns = [
     { field: "id", headerName: "ID", width: 100 },
     {
@@ -78,7 +113,7 @@ const DetailMajor = () => {
         <img
           src={params.value}
           alt="Profile"
-          style={{ width: 45, height: 45, borderRadius: "50%" }}
+          className="w-9 h-9 rounded-full"
         />
       ),
     },
@@ -90,7 +125,7 @@ const DetailMajor = () => {
     },
     { field: "lastName", headerName: "Last Name", width: 200, editable: true },
     { field: "gender", headerName: "Gender", width: 150, editable: true },
-    { field: "age", headerName: "Age", width: 150, editable: true },
+    { field: "birthday", headerName: "Birthday", width: 150, editable: true },
     { field: "email", headerName: "Email", width: 150, editable: true },
     {
       field: "phoneNumber",
@@ -101,11 +136,12 @@ const DetailMajor = () => {
     { field: "facebook", headerName: "Facebook", width: 150, editable: true },
     { field: "zalo", headerName: "Zalo", width: 150, editable: true },
     {
-      field: "Major.majorName",
+      field: "majorName",
       headerName: "Major",
       width: 150,
       editable: true,
     },
+
     {
       field: "delete",
       headerName: "Action",
@@ -130,17 +166,18 @@ const DetailMajor = () => {
   ];
 
   const formattedData = student.map((item, index) => ({
-    id: index + 1,
+    id: item.id,
     avatar: item.avatar,
     firstName: item.firstName,
     lastName: item.lastName,
     gender: item.gender,
-    age: item.age,
+    birthday: item.birthday,
     email: item.email,
     phoneNumber: item.phoneNumber,
     facebook: item.facebook,
     zalo: item.zalo,
-    "Major.majorName": item.Major ? item.Major.majorName : "",
+    majorName: item.majorName,
+    graduated: item.graduated,
   }));
 
   return (
@@ -162,7 +199,7 @@ const DetailMajor = () => {
         </ResponsiveContainer>
       </div>
 
-      <div className="flex items-center  mb-4">
+      <div className="flex items-center gap-4 mb-4">
         <Select
           value={yearOptions.find((option) => option.value === selectedYear)}
           defaultValue={yearOptions[0]}
@@ -171,6 +208,13 @@ const DetailMajor = () => {
           placeholder="Select Year"
           className="w-40"
         />
+
+        <div
+          onClick={() => setIsAddStudent(true)}
+          className="cursor-pointer p-2 rounded-md overflow-hidden shadow-md border border-blue-600 flex items-center justify-center bg-blue-600 hover:bg-blue-700 transition duration-300"
+        >
+          <FaPlus className="text-white text-2xl" />
+        </div>
       </div>
 
       <div style={{ height: 400, width: "100%", overflow: "auto" }}>
@@ -195,6 +239,11 @@ const DetailMajor = () => {
           }}
         />
       </div>
+      <ModalCreateStudentToMajor
+        setIsAddStudent={setIsAddStudent}
+        isAddStudent={isAddStudent}
+        majorId={majorId}
+      />
     </div>
   );
 };

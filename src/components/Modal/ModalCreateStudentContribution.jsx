@@ -12,7 +12,7 @@ const ModalCreateStudentContribution = ({
     date: "",
     typePayMoney: "",
     payMoney: "",
-    userId: 1,
+    userId: "",
   });
 
   const handleChange = (e) => {
@@ -94,7 +94,7 @@ const ModalCreateStudentContribution = ({
               UserId:
             </label>
             <input
-              type="number"
+              type="text"
               id="userId"
               name="userId"
               value={participantData.userId}

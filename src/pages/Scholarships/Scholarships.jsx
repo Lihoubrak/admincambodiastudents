@@ -8,6 +8,8 @@ import { SiSemanticscholar } from "react-icons/si";
 const Scholarships = () => {
   const [selectedYear, setSelectedYear] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(null);
+  const [studentScholarships, setStudentScholarships] = useState({});
+
   const handleYearChange = (selectedOption) => {
     setSelectedYear(selectedOption);
   };
@@ -36,59 +38,54 @@ const Scholarships = () => {
     { value: 12, label: "December" },
   ];
 
-  const scholarships = [
+  const students = [
     {
       id: 1,
-      name: "Full Scholarship",
-      amount: "$10,000",
-      deadline: "2024-08-31",
-      criteria: "GPA > 3.5",
-      status: "Open",
+      name: "John Doe",
+      scholarshipStatus: "Not granted",
     },
     {
       id: 2,
-      name: "Merit Scholarship",
-      amount: "$5,000",
-      deadline: "2024-07-15",
-      criteria: "Extracurricular activities",
-      status: "Closed",
+      name: "Jane Doe",
+      scholarshipStatus: "Granted",
     },
-    // Add more scholarships as needed
   ];
 
-  // Columns configuration for the table
   const columns = [
     { field: "name", headerName: "Name", width: 200 },
-    { field: "amount", headerName: "Amount", width: 150 },
-    { field: "deadline", headerName: "Deadline", width: 200 },
-    { field: "criteria", headerName: "Criteria", width: 200 },
-    { field: "status", headerName: "Status", width: 150 },
     {
-      field: "actions",
-      headerName: "Actions",
+      field: "scholarshipStatus",
+      headerName: "Scholarship Status",
       width: 200,
-
       renderCell: (params) => (
-        <div className="flex items-center gap-4">
-          <Link to={`/scholarship/detail/${params.row.id}`}>
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-20">
-              Detail
+        <div>
+          {params.value === "Granted" ? (
+            <FaCheck style={{ color: "green" }} />
+          ) : (
+            <button
+              onClick={() => toggleScholarshipStatus(params.row.id)}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+            >
+              Grant
             </button>
-          </Link>
-          <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-20">
-            Edit
-          </button>
+          )}
         </div>
       ),
     },
-    // Add more columns as needed
   ];
+
+  const toggleScholarshipStatus = (studentId) => {
+    setStudentScholarships((prev) => ({
+      ...prev,
+      [studentId]: prev[studentId] === "Granted" ? "Not granted" : "Granted",
+    }));
+  };
 
   return (
     <div>
       <h1 className="text-4xl gap-3 flex justify-center items-center font-bold mb-8 text-center text-blue-600">
         <SiSemanticscholar size={70} />
-        <span>SCHOLASHIP</span>
+        <span>SCHOLARSHIPS</span>
       </h1>
       <div className="flex items-center mb-8 gap-4">
         <Select
@@ -114,14 +111,14 @@ const Scholarships = () => {
           </div>
         </div>
         <div className="text-white gap-3 flex-1  p-2 rounded-md overflow-hidden shadow-md border border-green-600 flex items-center justify-center bg-blue-600 hover:bg-blue-700 transition duration-300">
-          <span className="font-bold">(Under): 4,700,000 dong/month</span>
-          <span className="font-bold">(Master's): 6,000,000 dong/month</span>
+          <span className="font-bold">(Bachelor's): 4,700,000 VND/month</span>
+          <span className="font-bold">(Master's): 6,000,000 VND/month</span>
         </div>
       </div>
 
       <div style={{ height: 400, width: "100%", overflow: "auto" }}>
         <DataGrid
-          rows={scholarships}
+          rows={students}
           columns={columns}
           pageSize={5}
           rowsPerPageOptions={[5, 10, 20]}

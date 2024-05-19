@@ -1,10 +1,10 @@
 // App.js
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import GlobalLayout from "./layouts/GlobalLayout";
-import { dormsRoutes, schRoutes } from "./Router";
-import { Login } from "./pages";
+import { dormsRoutes, schRoutes, adminRoutes } from "./Router";
 import { useAuth } from "./contexts/AuthContext";
+import Login from "./pages/Login/Login";
 const App = () => {
   const { userRole, loading } = useAuth();
   if (loading) {
@@ -35,9 +35,9 @@ const AuthenticatedRoutes = ({ userRole }) => {
       <Routes>
         {userRole === "KTX" && (
           <>
-            {dormsRoutes.map((route) => (
+            {dormsRoutes.map((route, index) => (
               <Route
-                key={route.path}
+                key={index}
                 path={route.path}
                 element={
                   <GlobalLayout>
@@ -50,9 +50,24 @@ const AuthenticatedRoutes = ({ userRole }) => {
         )}
         {userRole === "SCH" && (
           <>
-            {schRoutes.map((route) => (
+            {schRoutes.map((route, index) => (
               <Route
-                key={route.path}
+                key={index}
+                path={route.path}
+                element={
+                  <GlobalLayout>
+                    <route.component />
+                  </GlobalLayout>
+                }
+              />
+            ))}
+          </>
+        )}
+        {userRole === "Admin" && (
+          <>
+            {adminRoutes.map((route, index) => (
+              <Route
+                key={index}
                 path={route.path}
                 element={
                   <GlobalLayout>

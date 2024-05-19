@@ -76,7 +76,7 @@ const StudentRoom = () => {
   return (
     <div>
       {loading ? (
-        <div className="flex items-center justify-center translate-y-52 -translate-x-10">
+        <div className="flex items-center justify-center translate-y-52 -translate-x-3">
           <LoopCircleLoading color="#007bff" />
         </div>
       ) : (

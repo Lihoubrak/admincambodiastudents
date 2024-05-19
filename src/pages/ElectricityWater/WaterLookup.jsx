@@ -16,8 +16,8 @@ const WaterLookup = () => {
   const [error, setError] = useState(null);
   const currentYear = new Date().getFullYear();
   const { dormId } = useParams();
+  console.log(waterData);
   const month = new Date().getMonth() + 1;
-  const optionValue = `${month}/${currentYear}`;
   const today = new Date();
   const formattedDate = today.toISOString().split("T")[0];
   const [formData, setFormData] = useState({
@@ -75,7 +75,7 @@ const WaterLookup = () => {
       pricePerKwh: formData.pricePerKwh,
       support: formData.support,
       date: formData.date,
-      roomId: parseInt(room),
+      roomId: room,
     };
 
     try {
@@ -116,18 +116,26 @@ const WaterLookup = () => {
     { field: "totalAmount", headerName: "Total Amount", width: 150 },
   ];
 
-  const formattedData = waterData.map((item, index) => ({
-    id: index + 1,
-    date: item.date,
-    room: item.Room.roomNumber,
-    oldIndex: item.oldIndex,
-    newIndex: item.newIndex,
-    totalConsumption: item.totalConsumption,
-    support: item.support,
-    exceedLimit: item.exceedLimit,
-    pricePerKwh: item.pricePerKwh,
-    totalAmount: item.totalAmount,
-  }));
+  const formattedData = waterData.map((item, index) => {
+    const timestamp = item.date;
+    const date = new Date(timestamp._seconds * 1000); // Convert seconds to milliseconds
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Add leading zero if needed
+    const day = String(date.getDate()).padStart(2, "0"); // Add leading zero if needed
+    const dateString = `${year}-${month}-${day}`;
+    return {
+      id: index + 1,
+      date: dateString,
+      room: item.Room.roomNumber,
+      oldIndex: item.oldIndex,
+      newIndex: item.newIndex,
+      totalConsumption: item.totalConsumption,
+      support: item.support,
+      exceedLimit: item.exceedLimit,
+      pricePerKwh: item.pricePerKwh,
+      totalAmount: item.totalAmount,
+    };
+  });
 
   const exportFile = useCallback(() => {
     const ws = utils.json_to_sheet(formattedData);

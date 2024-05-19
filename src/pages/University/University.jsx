@@ -2,25 +2,57 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ModalCreateUniversity } from "../../components";
 import { FaUniversity } from "react-icons/fa";
-import { TokenRequest } from "../../RequestMethod/Request";
+import { getDecodeToken } from "../../utils/getDecodeToken";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "../../firebase/firebase";
 
 const University = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [university, setUniveresity] = useState([]);
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
+  const [university, setUniversity] = useState([]);
+  const userId = getDecodeToken().id;
+  const rolesArray = [
+    { id: 1, roleName: "Admin" },
+    { id: 2, roleName: "Manager" },
+    { id: 3, roleName: "User" },
+    // Add more roles as needed
+  ];
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-  const fetchAllUniversity = async () => {
-    const res = await TokenRequest.get("/schools/v4/all");
-    setUniveresity(res.data);
-  };
   useEffect(() => {
+    const fetchAllUniversity = async () => {
+      try {
+        const queries = rolesArray.map((role) =>
+          query(
+            collection(db, "schools"),
+            where("managers", "array-contains", {
+              userId,
+              role: role.roleName,
+            })
+          )
+        );
+
+        const universityData = [];
+        for (const q of queries) {
+          const querySnapshot = await getDocs(q);
+          querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            universityData.push({
+              id: doc.id,
+              schoolName: data.schoolName,
+              schoolLocation: data.schoolLocation,
+              schoolDescription: data.schoolDescription,
+              schoolImage: data.schoolImage,
+            });
+          });
+        }
+
+        setUniversity(universityData);
+      } catch (error) {
+        console.error("Error fetching universities:", error);
+      }
+    };
+
     fetchAllUniversity();
-  }, []);
+  }, [userId, rolesArray]);
+
   return (
     <div>
       <div className="flex justify-between items-center">
@@ -28,13 +60,6 @@ const University = () => {
           <FaUniversity size={50} />
           <span>UNIVERSITY</span>
         </h1>
-        {/* Create New University Button */}
-        <div
-          onClick={openModal}
-          className="min-w-[200px] py-2 cursor-pointer rounded overflow-hidden shadow-md border-2 border-blue-600 mb-4 flex items-center justify-center bg-blue-600 hover:bg-blue-700 transition duration-300"
-        >
-          <p className="text-white font-bold">Create New University</p>
-        </div>
       </div>
       <div className="flex flex-wrap gap-8 justify-center">
         {university.map((item, index) => (
@@ -64,11 +89,7 @@ const University = () => {
           </Link>
         ))}
       </div>
-      <ModalCreateUniversity
-        isOpen={isModalOpen}
-        closeModal={closeModal}
-        fetchAllUniversity={fetchAllUniversity}
-      />
+      {/* <ModalCreateUniversity isOpen={isModalOpen} closeModal={closeModal} /> */}
     </div>
   );
 };

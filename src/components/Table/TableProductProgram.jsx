@@ -8,7 +8,7 @@ import {
   FaTrash,
 } from "react-icons/fa";
 import * as XLSX from "xlsx"; // Add this import
-import { publicRequest } from "../../RequestMethod/Request";
+import { TokenRequest, publicRequest } from "../../RequestMethod/Request";
 
 const TableProductProgram = ({
   formatProduct,
@@ -17,10 +17,22 @@ const TableProductProgram = ({
   loading,
   programId,
   productError,
+  products,
 }) => {
-  const handleDelete = (id) => {};
+  const handleDelete = async (id) => {
+    try {
+      const response = await TokenRequest.delete(
+        `/productevents/v10/delete/${id}`
+      );
+      if (response.status === 200) {
+        setProducts(products.filter((product) => product.id !== id));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const columnsProduct = [
-    { field: "id", headerName: "No", width: 100, editable: true },
+    { field: "no", headerName: "No", width: 100, editable: true },
     {
       field: "productName",
       headerName: "Product Name",
@@ -109,13 +121,11 @@ const TableProductProgram = ({
   const totalMoney = formatProduct.reduce((accumulator, current) => {
     const total = parseFloat(current.total);
     if (!isNaN(total)) {
-      // Add the total value to the accumulator
       return accumulator + total;
     } else {
-      // Return the accumulator unchanged if total is not a valid number
       return accumulator;
     }
-  }, 0); // Initial value of the accumulator is set to 0
+  }, 0);
   return (
     <div>
       <div className="flex items-center justify-between my-4">
@@ -177,7 +187,9 @@ const TableProductProgram = ({
           disableSelectionOnClick
           loading={loading}
           localeText={{
-            noRowsLabel: productError,
+            noRowsLabel: !productError
+              ? "No product events found for the given event"
+              : "No data",
           }}
           sx={{
             "& .MuiDataGrid-cell, & .MuiDataGrid-columnHeaderTitleContainer": {

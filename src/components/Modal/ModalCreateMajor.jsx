@@ -7,7 +7,7 @@ const ModalCreateMajor = ({ isOpen, closeModal, schoolId, fetchMajor }) => {
   const [majorInfo, setMajorInfo] = useState({
     name: "",
     desc: "",
-    dateForStudying: "",
+
     image: null,
     schoolId,
   });
@@ -35,7 +35,6 @@ const ModalCreateMajor = ({ isOpen, closeModal, schoolId, fetchMajor }) => {
     formData.append("majorName", majorInfo.name);
     formData.append("majorDescription", majorInfo.desc);
     formData.append("majorImage", majorInfo.image);
-    formData.append("dateForStudying", majorInfo.dateForStudying);
     formData.append("schoolId", majorInfo.schoolId);
 
     try {
@@ -47,7 +46,7 @@ const ModalCreateMajor = ({ isOpen, closeModal, schoolId, fetchMajor }) => {
       setMajorInfo({
         name: "",
         desc: "",
-        dateForStudying: "",
+
         image: null,
         schoolId,
       });
@@ -126,22 +125,6 @@ const ModalCreateMajor = ({ isOpen, closeModal, schoolId, fetchMajor }) => {
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
-          <div className="form-group mb-4">
-            <label
-              htmlFor="dateForStudying"
-              className="block text-sm font-medium text-gray-700"
-            >
-              DateForStudying:
-            </label>
-            <input
-              type="text"
-              id="dateForStudying"
-              name="dateForStudying"
-              value={majorInfo.dateForStudying}
-              onChange={handleChange}
-              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
 
           <div className="form-group mb-4">
             <label
@@ -159,18 +142,7 @@ const ModalCreateMajor = ({ isOpen, closeModal, schoolId, fetchMajor }) => {
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
-          {majorInfo.image && (
-            <div className="form-group mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Preview:
-              </label>
-              <img
-                src={URL.createObjectURL(majorInfo.image)}
-                alt="Preview"
-                className="mt-1 w-full"
-              />
-            </div>
-          )}
+
           <button
             type="submit"
             className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"

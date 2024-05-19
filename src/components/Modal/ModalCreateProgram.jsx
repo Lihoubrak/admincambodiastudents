@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import Modal from "react-modal";
-import { TokenRequest, publicRequest } from "../../RequestMethod/Request";
+import { TokenRequest } from "../../RequestMethod/Request";
 import { FaTimesCircle } from "react-icons/fa";
 
-const ModalCreateProgram = ({ isOpen, closeModal, fetchPrograms }) => {
+const ModalCreateProgram = ({ isOpen, closeModal }) => {
   const [event, setEvent] = useState({
     eventName: "",
     eventLocation: "",
@@ -11,68 +11,88 @@ const ModalCreateProgram = ({ isOpen, closeModal, fetchPrograms }) => {
     eventDate: "",
     eventExpiry: "",
     eventImage: null,
-    foodMenu: "",
-    eventsInProgram: "",
+    foodMenu: [{ name: "" }],
+    eventsInProgram: [{ eventName: "" }],
     ticketPrice: "",
     paymentPerStudent: "",
     numberOfTicket: "",
-    userId: 3,
   });
-
-  const handleChange = (e) => {
-    if (e.target.name === "eventImage") {
-      setEvent((prevEvent) => ({
-        ...prevEvent,
-        eventImage: e.target.files[0],
-      }));
-    } else {
-      const { name, value } = e.target;
-      setEvent((prevEvent) => ({
-        ...prevEvent,
-        [name]: value,
-      }));
-    }
+  const handleFoodMenuChange = (e, index) => {
+    const { value } = e.target;
+    const updatedFoodMenu = [...event.foodMenu];
+    updatedFoodMenu[index] = { name: value };
+    setEvent({ ...event, foodMenu: updatedFoodMenu });
   };
+
+  const handleEventsInProgramChange = (e, index) => {
+    const { value } = e.target;
+    const updatedEventsInProgram = [...event.eventsInProgram];
+    updatedEventsInProgram[index] = { eventName: value };
+    setEvent({ ...event, eventsInProgram: updatedEventsInProgram });
+  };
+
+  const handleAddFoodMenuItem = () => {
+    const updatedFoodMenu = [...event.foodMenu, { name: "" }];
+    setEvent({ ...event, foodMenu: updatedFoodMenu });
+  };
+
+  const handleAddEventInProgram = () => {
+    const updatedEventsInProgram = [
+      ...event.eventsInProgram,
+      { eventName: "" },
+    ];
+    setEvent({ ...event, eventsInProgram: updatedEventsInProgram });
+  };
+
+  const handleRemoveFoodMenuItem = (index) => {
+    const updatedFoodMenu = [...event.foodMenu];
+    updatedFoodMenu.splice(index, 1);
+    setEvent({ ...event, foodMenu: updatedFoodMenu });
+  };
+
+  const handleRemoveEventInProgram = (index) => {
+    const updatedEventsInProgram = [...event.eventsInProgram];
+    updatedEventsInProgram.splice(index, 1);
+    setEvent({ ...event, eventsInProgram: updatedEventsInProgram });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       const formData = new FormData();
-      formData.append("eventImage", event.eventImage);
       formData.append("eventName", event.eventName);
+      formData.append("eventImage", event.eventImage);
       formData.append("eventLocation", event.eventLocation);
-      formData.append("eventDescription", event.eventDescription);
+      formData.append("eventDescription", event.eventDescription); // Ensure eventDescription is included
       formData.append("eventDate", event.eventDate);
       formData.append("eventExpiry", event.eventExpiry);
-      formData.append("foodMenu", event.foodMenu);
-      formData.append("eventsInProgram", event.eventsInProgram);
+      formData.append("foodMenu", JSON.stringify(event.foodMenu));
+      formData.append("eventsInProgram", JSON.stringify(event.eventsInProgram));
       formData.append("ticketPrice", event.ticketPrice);
       formData.append("paymentPerStudent", event.paymentPerStudent);
       formData.append("numberOfTicket", event.numberOfTicket);
-      formData.append("userId", event.userId);
 
       const res = await TokenRequest.post(`/events/v9/create`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-      fetchPrograms();
+
       setEvent({
         eventName: "",
         eventLocation: "",
-        eventDescription: "",
         eventDate: "",
         eventExpiry: "",
         eventImage: null,
-        foodMenu: "",
-        eventsInProgram: "",
+        foodMenu: [{ name: "" }],
+        eventsInProgram: [{ eventName: "" }],
+        eventDescription: "",
         ticketPrice: "",
         paymentPerStudent: "",
         numberOfTicket: "",
-        userId: 1,
       });
     } catch (error) {
-      // Handle error
       console.error(error);
     }
 
@@ -128,7 +148,9 @@ const ModalCreateProgram = ({ isOpen, closeModal, fetchPrograms }) => {
               id="eventName"
               name="eventName"
               value={event.eventName}
-              onChange={handleChange}
+              onChange={(e) =>
+                setEvent({ ...event, eventName: e.target.value })
+              }
               required
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
@@ -141,12 +163,14 @@ const ModalCreateProgram = ({ isOpen, closeModal, fetchPrograms }) => {
               Event Location:
             </label>
             <input
-              required
               type="text"
               id="eventLocation"
               name="eventLocation"
               value={event.eventLocation}
-              onChange={handleChange}
+              onChange={(e) =>
+                setEvent({ ...event, eventLocation: e.target.value })
+              }
+              required
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -158,12 +182,14 @@ const ModalCreateProgram = ({ isOpen, closeModal, fetchPrograms }) => {
               Event Description:
             </label>
             <input
-              required
               type="text"
               id="eventDescription"
               name="eventDescription"
               value={event.eventDescription}
-              onChange={handleChange}
+              onChange={(e) =>
+                setEvent({ ...event, eventDescription: e.target.value })
+              }
+              required
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -175,12 +201,14 @@ const ModalCreateProgram = ({ isOpen, closeModal, fetchPrograms }) => {
               Event Date:
             </label>
             <input
-              required
               type="date"
               id="eventDate"
               name="eventDate"
               value={event.eventDate}
-              onChange={handleChange}
+              onChange={(e) =>
+                setEvent({ ...event, eventDate: e.target.value })
+              }
+              required
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -192,12 +220,14 @@ const ModalCreateProgram = ({ isOpen, closeModal, fetchPrograms }) => {
               Event Expiry:
             </label>
             <input
-              required
               type="date"
               id="eventExpiry"
               name="eventExpiry"
               value={event.eventExpiry}
-              onChange={handleChange}
+              onChange={(e) =>
+                setEvent({ ...event, eventExpiry: e.target.value })
+              }
+              required
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -209,48 +239,88 @@ const ModalCreateProgram = ({ isOpen, closeModal, fetchPrograms }) => {
               Event Image:
             </label>
             <input
-              required
               type="file"
               id="eventImage"
               name="eventImage"
-              onChange={handleChange}
-              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          <div className="form-group mb-4">
-            <label
-              htmlFor="foodMenu"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Food Menu:
-            </label>
-            <input
+              onChange={(e) =>
+                setEvent({ ...event, eventImage: e.target.files[0] })
+              }
               required
-              type="text"
-              id="foodMenu"
-              name="foodMenu"
-              value={event.foodMenu}
-              onChange={handleChange}
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
-          <div className="form-group mb-4">
-            <label
-              htmlFor="eventsInProgram"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Events in Program:
-            </label>
-            <input
-              required
-              type="text"
-              id="eventsInProgram"
-              name="eventsInProgram"
-              value={event.eventsInProgram}
-              onChange={handleChange}
-              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
+          {/* Food Menu inputs */}
+          {event.foodMenu.map((item, index) => (
+            <div key={index} className="form-group mb-4">
+              <label
+                htmlFor={`foodName${index}`}
+                className="block text-sm font-medium text-gray-700"
+              >
+                Food Name:
+              </label>
+              <input
+                type="text"
+                id={`foodName${index}`}
+                name="name"
+                value={item.name}
+                onChange={(e) => handleFoodMenuChange(e, index)}
+                className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+              {index > 0 && (
+                <button
+                  type="button"
+                  onClick={() => handleRemoveFoodMenuItem(index)}
+                  className="text-red-500 ml-2"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={handleAddFoodMenuItem}
+            className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+          >
+            Add Food Item
+          </button>
+
+          {/* Events in Program inputs */}
+          {event.eventsInProgram.map((item, index) => (
+            <div key={index} className="form-group mb-4">
+              <label
+                htmlFor={`eventName${index}`}
+                className="block text-sm font-medium text-gray-700"
+              >
+                Event Name:
+              </label>
+              <input
+                type="text"
+                id={`eventName${index}`}
+                name="eventName"
+                value={item.eventName}
+                onChange={(e) => handleEventsInProgramChange(e, index)}
+                className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+              {index > 0 && (
+                <button
+                  type="button"
+                  onClick={() => handleRemoveEventInProgram(index)}
+                  className="text-red-500 ml-2"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={handleAddEventInProgram}
+            className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+          >
+            Add Event
+          </button>
+
           <div className="form-group mb-4">
             <label
               htmlFor="ticketPrice"
@@ -259,12 +329,14 @@ const ModalCreateProgram = ({ isOpen, closeModal, fetchPrograms }) => {
               Ticket Price:
             </label>
             <input
-              required
-              type="text"
+              type="number"
               id="ticketPrice"
               name="ticketPrice"
               value={event.ticketPrice}
-              onChange={handleChange}
+              onChange={(e) =>
+                setEvent({ ...event, ticketPrice: e.target.value })
+              }
+              required
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -276,12 +348,14 @@ const ModalCreateProgram = ({ isOpen, closeModal, fetchPrograms }) => {
               Payment per Student:
             </label>
             <input
-              required
-              type="text"
+              type="number"
               id="paymentPerStudent"
               name="paymentPerStudent"
               value={event.paymentPerStudent}
-              onChange={handleChange}
+              onChange={(e) =>
+                setEvent({ ...event, paymentPerStudent: e.target.value })
+              }
+              required
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -293,12 +367,14 @@ const ModalCreateProgram = ({ isOpen, closeModal, fetchPrograms }) => {
               Number of Ticket:
             </label>
             <input
-              required
-              type="text"
+              type="number"
               id="numberOfTicket"
               name="numberOfTicket"
               value={event.numberOfTicket}
-              onChange={handleChange}
+              onChange={(e) =>
+                setEvent({ ...event, numberOfTicket: e.target.value })
+              }
+              required
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>

@@ -3,7 +3,7 @@ import Modal from "react-modal";
 import { TokenRequest, publicRequest } from "../../RequestMethod/Request";
 import { FaTimesCircle } from "react-icons/fa";
 
-const ModalCreateDormitory = ({ isOpen, closeModal, fetchAlldorm }) => {
+const ModalCreateDormitory = ({ isOpen, closeModal }) => {
   const [dormInfo, setDormInfo] = useState({
     name: "",
     location: "",
@@ -47,7 +47,6 @@ const ModalCreateDormitory = ({ isOpen, closeModal, fetchAlldorm }) => {
         desc: "",
         image: null,
       });
-      fetchAlldorm();
       closeModal();
     } catch (error) {
       console.error("Error occurred:", error);

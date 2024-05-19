@@ -3,7 +3,7 @@ import Modal from "react-modal";
 import { TokenRequest, publicRequest } from "../../RequestMethod/Request";
 import { FaTimesCircle } from "react-icons/fa";
 
-const ModalCreateUniversity = ({ isOpen, closeModal, fetchAllUniversity }) => {
+const ModalCreateUniversity = ({ isOpen, closeModal }) => {
   const [universityInfo, setUniversityInfo] = useState({
     name: "",
     location: "",
@@ -48,7 +48,6 @@ const ModalCreateUniversity = ({ isOpen, closeModal, fetchAllUniversity }) => {
         desc: "",
         image: null,
       });
-      fetchAllUniversity();
       closeModal();
     } catch (error) {
       console.error("Error occurred:", error);

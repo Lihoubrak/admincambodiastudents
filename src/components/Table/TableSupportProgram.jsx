@@ -8,7 +8,7 @@ import {
   FaTrash,
 } from "react-icons/fa";
 import * as XLSX from "xlsx"; // Add this import
-import { publicRequest } from "../../RequestMethod/Request";
+import { TokenRequest, publicRequest } from "../../RequestMethod/Request";
 const TableSupportProgram = ({
   formatSupport,
   setIsModalOpenCreateSupport,
@@ -16,10 +16,22 @@ const TableSupportProgram = ({
   programId,
   setSupport,
   supportError,
+  support,
 }) => {
-  const handleDelete = (id) => {};
+  const handleDelete = async (id) => {
+    try {
+      const response = await TokenRequest.delete(
+        `/supportevents/v14/delete/${id}`
+      );
+      if (response.status === 200) {
+        setSupport(support.filter((supporta) => supporta.id !== id));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const columnsSupport = [
-    { field: "id", headerName: "No", width: 100, editable: true },
+    { field: "no", headerName: "No", width: 100, editable: true },
     { field: "supportName", headerName: "Name", width: 100, editable: true },
     {
       field: "supportSpecific",
@@ -154,7 +166,9 @@ const TableSupportProgram = ({
           disableSelectionOnClick
           loading={loading}
           localeText={{
-            noRowsLabel: supportError,
+            noRowsLabel: !supportError
+              ? "No support events found for the given event"
+              : "No data",
           }}
           sx={{
             "& .MuiDataGrid-cell, & .MuiDataGrid-columnHeaderTitleContainer": {

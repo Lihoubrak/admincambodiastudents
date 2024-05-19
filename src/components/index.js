@@ -26,6 +26,25 @@ import TableProductProgram from "./Table/TableProductProgram";
 import TableSupportProgram from "./Table/TableSupportProgram";
 import ModalCreateStudentToRoom from "./Modal/ModalCreateStudentToRoom";
 import ModalCreateSport from "./Modal/ModalCreateSport";
+import TableBuyTicketEvent from "./Table/TableBuyTicketEvent";
+import ModalCreateTicket from "./Modal/ModalCreateTicket";
+import TableTeamSport from "./Table/TableTeamSport";
+import ModalCreateTeamSport from "./Modal/ModalCreateTeamSport";
+import ModalCreateTeamPlayer from "./Modal/ModalCreateTeamPlayer";
+import TableTeamPlayer from "./Table/TableTeamPlayer";
+import ModalCreateStudentToMajor from "./Modal/ModalCreateStudentToMajor";
+import ModalUpdateRole from "./Modal/ModalUpdateRole";
+import ModalCreateManagerDormitory from "./Modal/ModalCreateManagerDormitory";
+import ModalCreateManagerUniversity from "./Modal/ModalCreateManagerUniversity";
+import ModalCreateRole from "./Modal/ModalCreateRole";
+import ModalCreateManagerSport from "./Modal/ModalCreateManagerSport";
+import ModalCreateManagerProgram from "./Modal/ModalCreateManagerProgram";
+import ModalReport from "./Modal/ModalReport";
+import ModalDeatilPatients from "./Modal/ModalDeatilPatients";
+import ModalEditPatients from "./Modal/ModalEditPatients";
+import ModalResetPassword from "./Modal/ModalResetPassword";
+import ModalDetailNotification from "./Modal/ModalDetailNotification";
+import ModalAddChat from "./Modal/ModalAddChat";
 
 export {
   ModalCreateRoom,
@@ -56,4 +75,23 @@ export {
   TableSupportProgram,
   ModalCreateStudentToRoom,
   ModalCreateSport,
+  TableBuyTicketEvent,
+  ModalCreateTicket,
+  TableTeamSport,
+  ModalCreateTeamSport,
+  ModalCreateTeamPlayer,
+  TableTeamPlayer,
+  ModalCreateStudentToMajor,
+  ModalUpdateRole,
+  ModalCreateManagerDormitory,
+  ModalCreateManagerUniversity,
+  ModalCreateRole,
+  ModalCreateManagerSport,
+  ModalCreateManagerProgram,
+  ModalReport,
+  ModalDeatilPatients,
+  ModalEditPatients,
+  ModalResetPassword,
+  ModalDetailNotification,
+  ModalAddChat,
 };

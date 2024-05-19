@@ -1,4 +1,11 @@
-import { configRouter } from "../config/route";
+import {
+  DetailListDormitory,
+  DetailListUniversity,
+  ListDormitory,
+  ListUniversity,
+  ManagerUser,
+} from "../admins";
+import { adminConfigRouter, configRouter } from "../config/route";
 import {
   DetailInfoPassport,
   DetailMajor,
@@ -6,7 +13,6 @@ import {
   DetailRoom,
   DetailStudent,
   DetailUniversity,
-  DetailInfoVisa,
   Dormitory,
   ElectricityLookup,
   ElectricityWater,
@@ -24,6 +30,9 @@ import {
   Login,
   Sport,
   DetailSport,
+  DetailTeam,
+  ProfileUser,
+  Notification,
 } from "../pages";
 const dormsRoutes = [
   { path: configRouter.home, component: Dormitory },
@@ -32,19 +41,22 @@ const dormsRoutes = [
   { path: configRouter.scholarships, component: Scholarships },
   { path: configRouter.passport, component: Passport },
   { path: configRouter.detailPassport, component: DetailPassport },
-  { path: configRouter.detailInfoVisa, component: DetailInfoVisa },
+
   { path: configRouter.detailInfoPassport, component: DetailInfoPassport },
   { path: configRouter.electricityWater, component: ElectricityWater },
   { path: configRouter.electricityLookup, component: ElectricityLookup },
   { path: configRouter.waterLookup, component: WaterLookup },
   { path: configRouter.dataStudent, component: DataStudent },
-  // { path: configRouter.healthcare, component: Healthcare },
+  { path: configRouter.healthcare, component: Healthcare },
   { path: configRouter.studentTasks, component: StudentTasks },
   { path: configRouter.inbox, component: Inbox },
   { path: configRouter.program, component: Program },
   { path: configRouter.detailProgram, component: DetailProgram },
   { path: configRouter.sport, component: Sport },
   { path: configRouter.detailSportEvent, component: DetailSport },
+  { path: configRouter.detailTeam, component: DetailTeam },
+  { path: configRouter.profile, component: ProfileUser },
+  { path: configRouter.notification, component: Notification },
 ];
 const schRoutes = [
   { path: configRouter.home, component: University },
@@ -58,5 +70,31 @@ const schRoutes = [
   // { path: configRouter.healthcare, component: Healthcare },
   { path: configRouter.dataStudent, component: DataStudent },
   { path: configRouter.sport, component: Sport },
+  { path: configRouter.profile, component: ProfileUser },
+  { path: configRouter.notification, component: Notification },
 ];
-export { dormsRoutes, schRoutes };
+
+const adminRoutes = [
+  { path: adminConfigRouter.university, component: ListUniversity },
+  {
+    path: adminConfigRouter.detaillistuniversity,
+    component: DetailListUniversity,
+  },
+  { path: adminConfigRouter.dormitory, component: ListDormitory },
+  {
+    path: adminConfigRouter.detaillistdormitory,
+    component: DetailListDormitory,
+  },
+  { path: adminConfigRouter.studentTasks, component: StudentTasks },
+  { path: adminConfigRouter.inbox, component: Inbox },
+  { path: adminConfigRouter.program, component: Program },
+  { path: adminConfigRouter.detailProgram, component: DetailProgram },
+  { path: adminConfigRouter.dataStudent, component: DataStudent },
+  { path: adminConfigRouter.dataStudent, component: DataStudent },
+  { path: adminConfigRouter.sport, component: Sport },
+  { path: adminConfigRouter.detailSportEvent, component: DetailSport },
+  { path: adminConfigRouter.managerUser, component: ManagerUser },
+  { path: adminConfigRouter.profile, component: ProfileUser },
+  { path: adminConfigRouter.notification, component: Notification },
+];
+export { dormsRoutes, schRoutes, adminRoutes };

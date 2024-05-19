@@ -47,10 +47,7 @@ const DetailUniversity = () => {
   const handleYearChange = (selectedOption) => {
     setSelectedYear(selectedOption.value);
   };
-  const handleDelete = (id) => {};
-  const handleDetail = (id) => {
-    navigation(`/university/student/${id}`);
-  };
+
   const yearOptions = [
     {
       value: new Date().getFullYear().toString(),
@@ -61,7 +58,7 @@ const DetailUniversity = () => {
   ];
 
   const columns = [
-    { field: "id", headerName: "ID", width: 100 },
+    { field: "no", headerName: "ID", width: 100 },
     {
       field: "avatar",
       headerName: "Profile",
@@ -82,7 +79,7 @@ const DetailUniversity = () => {
     },
     { field: "lastName", headerName: "Last Name", width: 200, editable: true },
     { field: "gender", headerName: "Gender", width: 150, editable: true },
-    { field: "age", headerName: "Age", width: 150, editable: true },
+    { field: "birthday", headerName: "Birthday", width: 150, editable: true },
     { field: "email", headerName: "Email", width: 150, editable: true },
     {
       field: "phoneNumber",
@@ -93,36 +90,16 @@ const DetailUniversity = () => {
     { field: "facebook", headerName: "Facebook", width: 150, editable: true },
     { field: "zalo", headerName: "Zalo", width: 150, editable: true },
     { field: "majorName", headerName: "Major", width: 150, editable: true },
-    {
-      field: "delete",
-      headerName: "Action",
-      width: 120,
-      renderCell: (params) => (
-        <div>
-          <button
-            onClick={() => handleDetail(params.row.id)}
-            className="p-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 mr-2"
-          >
-            <FaInfoCircle />
-          </button>
-          <button
-            onClick={() => handleDelete(params.row.id)}
-            className="p-1 bg-red-500 text-white rounded-md hover:bg-red-600"
-          >
-            <FaTrash />
-          </button>
-        </div>
-      ),
-    },
   ];
 
   const formattedData = students.map((item, index) => ({
-    id: index + 1,
+    id: item.id,
+    no: index + 1,
     avatar: item.avatar,
     firstName: item.firstName,
     lastName: item.lastName,
     gender: item.gender,
-    age: item.age,
+    birthday: item.birthday,
     email: item.email,
     phoneNumber: item.phoneNumber,
     facebook: item.facebook,
@@ -161,7 +138,7 @@ const DetailUniversity = () => {
   return (
     <div>
       {loading ? (
-        <div className="flex items-center justify-center translate-y-52 -translate-x-10">
+        <div className="flex items-center justify-center translate-y-52 -translate-x-3">
           <LoopCircleLoading color="#007bff" />
         </div>
       ) : (

@@ -23,4 +23,26 @@ export const configRouter = {
   dataStudent: "/data",
   sport: "/sport",
   detailSportEvent: "detailSportEvent/:sportId",
+  detailTeam: "detailTeam/:teamId",
+  profile: "/profile",
+  notification: "/notification",
+};
+
+export const adminConfigRouter = {
+  university: "/",
+  detaillistuniversity: "/detaillistuniversity/:universityId",
+  dormitory: "/dormitory",
+  detaillistdormitory: "/detaillistdormitory/:dormId",
+  studentTasks: "/tasks",
+  inbox: "/inbox",
+  users: "/users",
+  program: "/program",
+  detailProgram: "/detailProgram/:detailProgramId",
+  dataStudent: "/data",
+  sport: "/sport",
+  detailSportEvent: "detailSportEvent/:sportId",
+  detailTeam: "detailTeam/:teamId",
+  managerUser: "/manager-user",
+  profile: "/profile",
+  notification: "/notification",
 };

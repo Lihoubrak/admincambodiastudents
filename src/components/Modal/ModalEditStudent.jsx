@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Modal from "react-modal";
 import { FaTimesCircle } from "react-icons/fa";
 import { TokenRequest, publicRequest } from "../../RequestMethod/Request";
+import { LoopCircleLoading } from "react-loadingg";
 
 const ModalEditStudent = ({
   isModalOpen,
@@ -12,14 +13,15 @@ const ModalEditStudent = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true); // Add loading state
+
   useEffect(() => {
     const fetchAllStudents = async () => {
+      setLoading(true);
       try {
         const res = await TokenRequest.get("/users/v1/all");
-        const filteredStudents = res.data.filter(
-          (student) => student.id !== studentId
-        );
-        setStudents(filteredStudents);
+        setStudents(res.data);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching students:", error);
       }
@@ -43,6 +45,7 @@ const ModalEditStudent = ({
       setIsModalOpen(false);
     }
   };
+
   const filteredStudents = students.filter(
     (student) =>
       student.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -90,45 +93,61 @@ const ModalEditStudent = ({
           className="border border-gray-300 rounded px-3 py-2 mb-4 w-full outline-none"
         />
 
-        <ul className="divide-y divide-gray-200" style={{ overflowY: "auto" }}>
-          {filteredStudents.map((student) => (
-            <li
-              key={student.id}
-              className="flex items-center justify-between py-2"
-            >
-              <div>
-                <p className="font-semibold">
-                  {student.firstName} {student.lastName}
-                </p>
-                <p className="text-sm text-gray-500">
-                  Dorm: {student.Room?.Dormitory?.dormName}
-                </p>
-                <p className="text-sm text-gray-500">
-                  Room: {student.Room?.roomNumber}
-                </p>
-                <p className="text-sm text-gray-500">Age: {student.age}</p>
-                <p className="text-sm text-gray-500">
-                  Nationality: {student.nationality}
-                </p>
-                <p className="text-sm text-gray-500">
-                  Gender: {student.gender}
-                </p>
-                <p className="text-sm text-gray-500">Email: {student.email}</p>
-                <p className="text-sm text-gray-500">
-                  Phone Number: {student.phoneNumber}
-                </p>
-              </div>
-              <div>
-                <button
-                  className="bg-blue-500 text-white px-3 py-1 rounded mr-2"
-                  onClick={() => handleSelectClick(student)}
+        {loading ? (
+          <div className="flex items-center justify-center translate-y-52 -translate-x-3">
+            <LoopCircleLoading color="#007bff" />
+          </div>
+        ) : (
+          <ul
+            className="divide-y divide-gray-200"
+            style={{ overflowY: "auto" }}
+          >
+            {filteredStudents
+              .filter((student) => student.id !== studentId)
+              .map((student) => (
+                <li
+                  key={student.id}
+                  className="flex items-center justify-between py-2"
                 >
-                  Select
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
+                  <div>
+                    <p className="font-semibold">
+                      {student.firstName} {student.lastName}
+                    </p>
+                    <div className="text-sm text-gray-500">
+                      <p>Dorm: {student.Room?.Dormitory?.dormName}</p>
+                      <p>Room: {student.Room?.roomNumber}</p>
+                      <p>Birthday: {student.birthday}</p>
+                      <p>Nationality: {student.nationality}</p>
+                      <p>Gender: {student.gender}</p>
+                      <p>Email: {student.email}</p>
+                      <p>Phone Number: {student.phoneNumber}</p>
+                      <p
+                        className={
+                          student.graduated
+                            ? "text-green-600 font-bold"
+                            : "text-red-600 font-bold"
+                        }
+                      >
+                        Graduated: {student.graduated ? "Yes" : "No"}
+                      </p>
+
+                      <p className="text-yellow-700 font-bold">
+                        Left Room Go Home: {student.leftRoomYear}
+                      </p>
+                    </div>
+                  </div>
+                  <div>
+                    <button
+                      className="bg-blue-500 text-white px-3 py-1 rounded mr-2 cursor-pointer"
+                      onClick={() => handleSelectClick(student)}
+                    >
+                      Select
+                    </button>
+                  </div>
+                </li>
+              ))}
+          </ul>
+        )}
       </div>
     </Modal>
   );

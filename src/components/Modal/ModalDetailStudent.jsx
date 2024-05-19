@@ -1,46 +1,56 @@
-import React, { useEffect, useState } from "react";
-import { FaTimesCircle } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
 import Modal from "react-modal";
-import PassportInformation from "../Information/PassportInformation";
-import VisaInformation from "../Information/VisaInformation";
-import AcademicInformation from "../Information/AcademicInformation";
-import AccommodationInformation from "../Information/AccommodationInformation";
-import { publicRequest } from "../../RequestMethod/Request";
+import { FaTimes, FaTimesCircle } from "react-icons/fa";
+import { BsCup, BsBook, BsHouseDoorFill } from "react-icons/bs";
+import { AiOutlineTable } from "react-icons/ai";
+import { FaBed } from "react-icons/fa";
+import { LuLamp } from "react-icons/lu";
+import { GiPillow } from "react-icons/gi";
+import { TokenRequest } from "../../RequestMethod/Request";
+
+// Define mapping object for item names to icons
+const iconMap = {
+  cup: <BsCup />,
+  pillow: <GiPillow />,
+  lamp: <LuLamp />,
+  table: <AiOutlineTable />,
+  pillowcase: <BsBook />,
+  mattress: <FaBed />,
+};
 
 const ModalDetailStudent = ({
   detailModalOpen,
   setDetailModalOpen,
   studentId,
 }) => {
-  // State to keep track of active tab
-  const [activeTab, setActiveTab] = useState("passport");
-  const [studentInfo, setStudentInfo] = useState(null);
-  useEffect(() => {
-    const fetchPassport = async () => {
-      const res = await publicRequest.get(`/passports/v6/detail/${studentId}`);
-      setStudentInfo(res.data);
-    };
-    fetchPassport();
-  }, [studentId]);
-  // Function to handle tab click
-  const handleTabClick = (tab) => {
-    setActiveTab(tab);
-  };
+  const [checkedItems, setCheckedItems] = useState({});
+  const [error, setError] = useState(null); // State for error message
 
-  // Render content based on active tab
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case "passport":
-        return <PassportInformation studentInfo={studentInfo} />;
-      case "visa":
-        return <VisaInformation studentInfo={studentInfo} />;
-      case "academic":
-        return <AcademicInformation />;
-      case "accommodation":
-        return <AccommodationInformation />;
-      default:
-        return null;
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await TokenRequest.get(
+          `rooms/v3/usermaterials/${studentId}`
+        );
+        const materialsData = response.data;
+        setCheckedItems(materialsData);
+        setError(null); // Clear error if successful
+      } catch (error) {
+        console.error("Error fetching materials:", error);
+        setError("Materials Not Found"); // Set error message
+      }
+    };
+
+    if (detailModalOpen) {
+      fetchData();
     }
+  }, [detailModalOpen, studentId]);
+
+  const handleToggleItem = (item) => {
+    setCheckedItems((prevState) => ({
+      ...prevState,
+      [item]: !prevState[item],
+    }));
   };
 
   return (
@@ -55,7 +65,9 @@ const ModalDetailStudent = ({
           backgroundColor: "rgba(0, 0, 0, 0.5)",
         },
         content: {
-          height: "100%",
+          maxWidth: "600px",
+          width: "100%",
+          maxHeight: "80vh",
           margin: "auto",
           boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
           background: "white",
@@ -75,45 +87,49 @@ const ModalDetailStudent = ({
             <FaTimesCircle className="mr-1" size={20} color="red" />
           </button>
         </div>
-        <div>
-          <div className="mb-4 flex gap-3">
-            <div
-              className={`p-3 rounded-md bg-gray-200 cursor-pointer hover:bg-gray-300 transition duration-300 ${
-                activeTab === "passport" ? "bg-gray-300" : ""
-              }`}
-              onClick={() => handleTabClick("passport")}
-            >
-              Passport Information
-            </div>
-            <div
-              className={`p-3 rounded-md bg-gray-200 cursor-pointer hover:bg-gray-300 transition duration-300 ${
-                activeTab === "visa" ? "bg-gray-300" : ""
-              }`}
-              onClick={() => handleTabClick("visa")}
-            >
-              Visa Information
-            </div>
-            <div
-              className={`p-3 rounded-md bg-gray-200 cursor-pointer hover:bg-gray-300 transition duration-300 ${
-                activeTab === "academic" ? "bg-gray-300" : ""
-              }`}
-              onClick={() => handleTabClick("academic")}
-            >
-              Academic Information
-            </div>
-            <div
-              className={`p-3 rounded-md bg-gray-200 cursor-pointer hover:bg-gray-300 transition duration-300 ${
-                activeTab === "accommodation" ? "bg-gray-300" : ""
-              }`}
-              onClick={() => handleTabClick("accommodation")}
-            >
-              Accommodation Information
-            </div>
-          </div>
-          {renderTabContent()}
+        <div className="text-gray-800">
+          <p className="font-bold mb-4">Supply:</p>
+          {error ? (
+            <p className="text-red-500">{error}</p>
+          ) : (
+            <ul className="list-none p-0">
+              {Object.entries(checkedItems).map(([key, value]) => (
+                <ItemWithCheckbox
+                  key={key}
+                  icon={iconMap[key]} // Use icon mapping based on item name
+                  item={key}
+                  text={key}
+                  checked={value}
+                  handleToggleItem={handleToggleItem}
+                />
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </Modal>
+  );
+};
+
+const ItemWithCheckbox = ({ icon, text, item, checked, handleToggleItem }) => {
+  const handleToggle = () => {
+    handleToggleItem(item);
+  };
+
+  return (
+    <div className="border p-2 rounded-md mb-2 flex justify-between items-center">
+      <li className="flex items-center">
+        {icon}
+        <span className="ml-2">{text}</span>
+      </li>
+      <input
+        type="checkbox"
+        checked={checked}
+        style={{
+          cursor: "not-allowed",
+        }}
+      />
+    </div>
   );
 };
 

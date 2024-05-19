@@ -26,7 +26,7 @@ const DataStudent = () => {
     { field: "username", headerName: "Username", width: 150 },
     { field: "firstName", headerName: "First Name", width: 150 },
     { field: "lastName", headerName: "Last Name", width: 150 },
-    { field: "age", headerName: "Age", width: 100 },
+    { field: "birthday", headerName: "Birthday", width: 100 },
     { field: "nationality", headerName: "Nationality", width: 150 },
     { field: "gender", headerName: "Gender", width: 100 },
     { field: "email", headerName: "Email", width: 200 },
@@ -35,6 +35,8 @@ const DataStudent = () => {
     { field: "zalo", headerName: "Zalo", width: 200 },
     { field: "avatar", headerName: "Avatar", width: 200 },
     { field: "major", headerName: "Major", width: 150 },
+    { field: "degree", headerName: "Degree", width: 150 },
+    { field: "year", headerName: "YearStudy", width: 150 },
     { field: "room", headerName: "Room", width: 150 },
   ];
   useEffect(() => {
@@ -43,7 +45,7 @@ const DataStudent = () => {
       setDormitories(res.data);
     };
     const fetchAllSchool = async () => {
-      const res = await publicRequest.get(`/schools/v4/allschool`);
+      const res = await TokenRequest.get(`/schools/v4/allschool`);
       setSchools(res.data);
     };
     fetchAllSchool();
@@ -77,21 +79,22 @@ const DataStudent = () => {
   const handleSave = async () => {
     try {
       const promises = rows.map(async (item) => {
-        console.log(item);
         const {
           username,
           firstName,
           lastName,
-          age,
+          birthday,
           nationality,
           gender,
           email,
           phoneNumber,
           facebook,
           zalo,
-          // avatar,
+          avatar,
           room,
           major,
+          degree,
+          year,
         } = item;
         const response = await publicRequest.post("/users/v1/register", {
           username,
@@ -99,27 +102,39 @@ const DataStudent = () => {
           confirmPassword,
           firstName,
           lastName,
-          age,
+          birthday,
           nationality,
           gender,
           email,
           phoneNumber,
           facebook,
           zalo,
-          // avatar,
+          avatar,
           room,
           major,
+          degree,
+          year,
           schoolId: selectedSchool,
           dormitoryId: selectedDormitory,
         });
-
         return response.data;
       });
 
       const results = await Promise.all(promises);
-      console.log(results);
+
+      // Check if all responses were successful (contain the message "User registered successfully.")
+      const allSuccessful = results.every(
+        (result) => result.message === "User registered successfully."
+      );
+      if (allSuccessful) {
+        window.alert("Data saved successfully!");
+        setRows([]);
+      } else {
+        window.alert("Some data could not be saved successfully!");
+      }
     } catch (error) {
       console.error(error);
+      window.alert("An error occurred while saving data!");
     }
   };
 

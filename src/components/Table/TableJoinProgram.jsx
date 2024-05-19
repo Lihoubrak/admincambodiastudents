@@ -8,16 +8,32 @@ import {
   FaTrash,
 } from "react-icons/fa";
 import * as XLSX from "xlsx";
+import { publicRequest } from "../../RequestMethod/Request";
 
 const TableJoinProgram = ({
   formatParticipant,
   setIsModalOpenCreateJoinProgram,
   loading,
   participantEventError,
+  setParticipantEvents,
+  participantEvents,
 }) => {
-  const handleDelete = (id) => {};
+  const handleDelete = async (id) => {
+    try {
+      const response = await publicRequest.delete(
+        `/participantevents/v11/delete/${id}`
+      );
+      if (response.status === 200) {
+        setParticipantEvents(
+          participantEvents.filter((participant) => participant.id !== id)
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const columnsJoinProgram = [
-    { field: "id", headerName: "No", width: 120, editable: true },
+    { field: "no", headerName: "No", width: 120, editable: true },
     {
       field: "avatar",
       headerName: "Profile",
@@ -32,7 +48,7 @@ const TableJoinProgram = ({
     },
     { field: "firstName", headerName: "First Name", editable: true },
     { field: "lastName", headerName: "Last Name", editable: true },
-    { field: "age", headerName: "Age", width: 100 },
+    { field: "birthday", headerName: "Birthday", width: 100 },
     { field: "nationality", headerName: "Nationality", editable: true },
     { field: "gender", headerName: "Gender", width: 100 },
     { field: "email", headerName: "Email", editable: true },
@@ -118,7 +134,9 @@ const TableJoinProgram = ({
           disableSelectionOnClick
           loading={loading}
           localeText={{
-            noRowsLabel: participantEventError,
+            noRowsLabel: !participantEventError
+              ? "No ParticipantEvent  found for the given ParticipantEvent"
+              : "No data",
           }}
           sx={{
             "& .MuiDataGrid-cell, & .MuiDataGrid-columnHeaderTitleContainer": {

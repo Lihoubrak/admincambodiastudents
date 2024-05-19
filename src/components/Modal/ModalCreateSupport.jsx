@@ -7,7 +7,6 @@ const ModalCreateSupport = ({
   programId,
   isModalOpenCreateSupport,
   setIsModalOpenCreateSupport,
-  fetchSupport,
 }) => {
   const [supportEvent, setSupportEvent] = useState({
     supportName: "",
@@ -42,7 +41,6 @@ const ModalCreateSupport = ({
       typePay: "",
       EventId: programId,
     });
-    fetchSupport();
     setIsModalOpenCreateSupport(false);
   };
 

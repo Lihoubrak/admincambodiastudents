@@ -13,8 +13,7 @@ const ModalCreateJoinProgram = ({
   const [participantData, setParticipantData] = useState({
     date: "",
     typePayMoney: "",
-    payMoney: "",
-    userId: 1,
+    userId: "",
     eventId: programId,
   });
 
@@ -35,7 +34,6 @@ const ModalCreateJoinProgram = ({
         {
           date: participantData.date,
           typePayMoney: participantData.typePayMoney,
-          payMoney: participantData.payMoney,
           userId: participantData.userId,
           eventId: participantData.eventId,
         }
@@ -45,7 +43,7 @@ const ModalCreateJoinProgram = ({
       setParticipantData({
         date: "",
         typePayMoney: "",
-        payMoney: "",
+
         userId: 1,
         eventId: programId,
       });
@@ -100,7 +98,7 @@ const ModalCreateJoinProgram = ({
               UserId:
             </label>
             <input
-              type="number"
+              type="text"
               id="userId"
               name="userId"
               value={participantData.userId}
@@ -138,23 +136,6 @@ const ModalCreateJoinProgram = ({
               id="typePayMoney"
               name="typePayMoney"
               value={participantData.typePayMoney}
-              onChange={handleChange}
-              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              required
-            />
-          </div>
-          <div className="form-group mb-4">
-            <label
-              htmlFor="payMoney"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Payment Amount:
-            </label>
-            <input
-              type="number"
-              id="payMoney"
-              name="payMoney"
-              value={participantData.payMoney}
               onChange={handleChange}
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               required

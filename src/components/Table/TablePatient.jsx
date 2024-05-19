@@ -1,17 +1,38 @@
 import { DataGrid } from "@mui/x-data-grid";
-import React, { useCallback, useRef } from "react";
-import { FaDownload, FaFileImport, FaPlus, FaSave } from "react-icons/fa";
+import React, { useCallback, useRef, useState } from "react";
+import {
+  FaDownload,
+  FaEdit,
+  FaFileImport,
+  FaInfoCircle,
+  FaPlus,
+  FaSave,
+} from "react-icons/fa";
 import { utils, writeFile } from "xlsx";
 import * as XLSX from "xlsx";
+import ModalDeatilPatients from "../Modal/ModalDeatilPatients";
+import ModalEditPatients from "../Modal/ModalEditPatients";
 const TablePatient = ({
   formatPatient,
   openPatientModal,
   setPatients,
   patientError,
   loading,
+  patients,
 }) => {
+  const [healthcareId, setHealthcare] = useState(null);
+  const [isModalDetail, setIsModalDetail] = useState(false);
+  const [isModalEdit, setIsModalEdit] = useState(false);
+  const handleDetail = (id) => {
+    setHealthcare(id);
+    setIsModalDetail(true);
+  };
+  const handleEdit = (id) => {
+    setHealthcare(id);
+    setIsModalEdit(true);
+  };
   const patientColumns = [
-    { field: "id", headerName: "No", width: 120, editable: true },
+    { field: "no", headerName: "No", width: 120, editable: true },
     {
       field: "avatar",
       headerName: "Profile",
@@ -26,8 +47,8 @@ const TablePatient = ({
     },
     { field: "firstName", headerName: "First Name", editable: true },
     { field: "lastName", headerName: "Last Name", editable: true },
-    { field: "age", headerName: "Age", width: 100 },
-    { field: "gender", headerName: "Gender", width: 100 },
+    { field: "birthday", headerName: "Birthday", width: 100, editable: true },
+    { field: "gender", headerName: "Gender", width: 100, editable: true },
     {
       field: "phoneNumber",
       headerName: "Phone Number",
@@ -36,15 +57,45 @@ const TablePatient = ({
     },
     { field: "room", headerName: "Room", width: 150, editable: true },
     { field: "dormitory", headerName: "Dormitory", width: 150, editable: true },
-    { field: "typeofDisease", headerName: "Type of Disease", width: 150 },
-    { field: "cost", headerName: "Cost", width: 150 },
-    { field: "discount", headerName: "Discount", width: 150 },
-    { field: "totalPatientPay", headerName: "Total Patient Pay", width: 200 },
-    { field: "date", headerName: "Date", width: 150 },
-    { field: "hospital", headerName: "Hospital", width: 150 },
-    { field: "note", headerName: "Note", width: 150 },
+    {
+      field: "typeofDisease",
+      headerName: "Type of Disease",
+      width: 150,
+      editable: true,
+    },
+    { field: "cost", headerName: "Cost", width: 150, editable: true },
+    { field: "discount", headerName: "Discount", width: 150, editable: true },
+    {
+      field: "totalPatientPay",
+      headerName: "Total Patient Pay",
+      width: 200,
+      editable: true,
+    },
+    { field: "date", headerName: "Date", width: 150, editable: true },
+    { field: "hospital", headerName: "Hospital", width: 150, editable: true },
+    { field: "note", headerName: "Note", width: 150, editable: true },
+    {
+      field: "delete",
+      headerName: "Action",
+      width: 120,
+      renderCell: (params) => (
+        <>
+          <button
+            onClick={() => handleEdit(params.row.id)}
+            className="p-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 mr-2"
+          >
+            <FaEdit />
+          </button>
+          <button
+            onClick={() => handleDetail(params.row.id)}
+            className="p-1 bg-green-500 text-white rounded-md hover:bg-green-600"
+          >
+            <FaInfoCircle />
+          </button>
+        </>
+      ),
+    },
   ];
-
   const importRef = useRef(null);
   const exportFileOfPatient = useCallback(() => {
     const ws = utils.json_to_sheet(formatPatient);
@@ -68,7 +119,7 @@ const TablePatient = ({
     importRef.current.click();
   };
   const totalDiscount = formatPatient.reduce(
-    (total, patient) => total + patient.discount,
+    (total, patient) => total + parseFloat(patient.discount),
     0
   );
   const handleSave = () => {};
@@ -130,7 +181,7 @@ const TablePatient = ({
           rowsPerPageOptions={[5, 10, 20]}
           disableSelectionOnClick
           loading={loading}
-          localeText={{ noRowsLabel: patientError }}
+          // localeText={{ noRowsLabel: patientError }}
           sx={{
             "& .MuiDataGrid-cell, & .MuiDataGrid-columnHeaderTitleContainer": {
               display: "flex",
@@ -151,6 +202,18 @@ const TablePatient = ({
           Total: {totalDiscount.toLocaleString()} dong
         </p>
       </div>
+      <ModalDeatilPatients
+        healthcareId={healthcareId}
+        isModalDetail={isModalDetail}
+        setIsModalDetail={setIsModalDetail}
+      />
+      <ModalEditPatients
+        healthcareId={healthcareId}
+        isModalEdit={isModalEdit}
+        setIsModalEdit={setIsModalEdit}
+        setPatients={setPatients}
+        patients={patients}
+      />
     </div>
   );
 };

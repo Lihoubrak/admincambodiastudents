@@ -8,7 +8,6 @@ const ModalCreateProductEvent = ({
   isModalOpenCreate,
   setIsModalOpenCreate,
   programId,
-  fetchProduct,
 }) => {
   const [productName, setProductName] = useState("");
   const [quantity, setQuantity] = useState("");
@@ -52,8 +51,6 @@ const ModalCreateProductEvent = ({
       note: eventData.note,
       eventId: programId,
     });
-    console.log(res.data);
-    fetchProduct();
     setPrice("");
     setNote("");
     setProductName("");

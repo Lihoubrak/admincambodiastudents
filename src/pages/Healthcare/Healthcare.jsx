@@ -128,14 +128,17 @@ const Healthcare = () => {
     fetchData();
   }, [selectedYear, selectedMonth]);
 
-  const formatStudentContributions = studentContributions.map(
-    (item, index) => ({
+  const formatStudentContributions = studentContributions.map((item, index) => {
+    const date = item?.date
+      ? new Date(item.date._seconds * 1000).toLocaleDateString()
+      : "";
+    return {
       id: index + 1,
       avatar: item.User?.avatar,
       firstName: item.User?.firstName,
       lastName: item.User?.lastName,
       gender: item.User?.gender,
-      age: item.User?.age,
+      birthday: item.User?.birthday,
       nationality: item.User?.nationality,
       email: item.User?.email,
       phoneNumber: item.User?.phoneNumber,
@@ -145,31 +148,58 @@ const Healthcare = () => {
       dormitory: item.User?.Room ? item.User.Room?.Dormitory.dormName : "",
       typePayMoney: item?.typePayMoney,
       payMoney: item?.payMoney,
-      date: item?.date,
-    })
-  );
-  const formatPatient = patients.map((item, index) => ({
-    id: index + 1,
-    avatar: item.User?.avatar,
-    firstName: item.User?.firstName,
-    lastName: item.User?.lastName,
-    gender: item.User?.gender,
-    age: item.User?.age,
-    phoneNumber: item.User?.phoneNumber,
-    room: item.User?.Room ? item.User?.Room.roomNumber : "",
-    dormitory: item.User?.Room ? item.User.Room?.Dormitory.dormName : "",
-    typeofDisease: item.typeofDisease,
-    cost: item.cost,
-    note: item.note,
-    date: item.date,
-    discount: item.discount,
-    totalPatientPay: item.totalPatientPay,
-    hospital: item.hospital,
-  }));
+      date: date,
+    };
+  });
+
+  const formatPatient = patients.map((item, index) => {
+    const id = item.id;
+    const avatar = item?.User?.avatar;
+    const firstName = item?.User?.firstName;
+    const lastName = item?.User?.lastName;
+    const gender = item?.User?.gender;
+    const birthday = item?.User?.birthday;
+    const phoneNumber = item?.User?.phoneNumber;
+    const room = item?.User?.Room ? item.User.Room.roomNumber : "";
+    const dormitory = item?.User?.Room
+      ? item.User.Room?.Dormitory.dormName
+      : "";
+    const typeofDisease = item?.typeofDisease || "";
+    const cost = item?.cost || "";
+    const note = item?.note || "";
+    const discount = item?.discount || "";
+    const totalPatientPay = item?.totalPatientPay || "";
+    const hospital = item?.hospital || "";
+
+    // Convert date to a human-readable string
+    const date = item?.date
+      ? new Date(item.date._seconds * 1000).toLocaleDateString()
+      : "";
+
+    return {
+      no: index + 1,
+      id,
+      avatar,
+      firstName,
+      lastName,
+      gender,
+      birthday,
+      phoneNumber,
+      room,
+      dormitory,
+      typeofDisease,
+      cost,
+      note,
+      date,
+      discount,
+      totalPatientPay,
+      hospital,
+    };
+  });
   return (
     <div>
       {loading ? (
-        <div className="flex items-center justify-center translate-y-52 -translate-x-10">
+        <div className="flex items-center justify-center translate-y-52 -translate-x-3">
           <LoopCircleLoading color="#007bff" />
         </div>
       ) : (
@@ -269,6 +299,7 @@ const Healthcare = () => {
             formatPatient={formatPatient}
             openPatientModal={openPatientModal}
             setPatients={setPatients}
+            patients={patients}
             patientError={patientError}
             loading={loading}
           />

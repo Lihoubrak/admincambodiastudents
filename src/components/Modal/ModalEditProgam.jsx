@@ -1,30 +1,124 @@
 import React, { useState } from "react";
 import Modal from "react-modal";
+import { TokenRequest } from "../../RequestMethod/Request";
 import { FaTimesCircle } from "react-icons/fa";
-const ModalCreateSport = ({ isOpen, closeModal, createSportEvent }) => {
-  const [eventName, setEventName] = useState("");
-  const [eventDate, setEventDate] = useState("");
-  const [eventLocation, setEventLocation] = useState("");
-  const [eventDescription, setEventDescription] = useState("");
-  const [eventImage, setEventImage] = useState("");
 
-  const handleSubmit = (e) => {
+const ModalEditProgam = ({
+  isModalOpenEdit,
+  setIsModalOpenEdit,
+  fetchEvent,
+  programId,
+}) => {
+  const [event, setEvent] = useState({
+    eventName: "",
+    eventLocation: "",
+    eventDate: "",
+    eventExpiry: "",
+    eventImage: null,
+    foodMenu: [{ name: "" }],
+    eventsInProgram: [{ eventName: "" }],
+    eventDescription: "",
+    ticketPrice: "",
+    paymentPerStudent: "",
+    numberOfTicket: "",
+  });
+  const handleFoodMenuChange = (e, index) => {
+    const { value } = e.target;
+    setEvent((prevState) => ({
+      ...prevState,
+      foodMenu: prevState.foodMenu.map((item, i) =>
+        i === index ? { ...item, name: value } : item
+      ),
+    }));
+  };
+
+  const handleEventsInProgramChange = (e, index) => {
+    const { value } = e.target;
+    setEvent((prevState) => ({
+      ...prevState,
+      eventsInProgram: prevState.eventsInProgram.map((item, i) =>
+        i === index ? { ...item, eventName: value } : item
+      ),
+    }));
+  };
+
+  const handleAddFoodMenuItem = () => {
+    const updatedFoodMenu = [...event.foodMenu, { name: "" }];
+    setEvent({ ...event, foodMenu: updatedFoodMenu });
+  };
+
+  const handleAddEventInProgram = () => {
+    const updatedEventsInProgram = [
+      ...event.eventsInProgram,
+      { eventName: "" },
+    ];
+    setEvent({ ...event, eventsInProgram: updatedEventsInProgram });
+  };
+
+  const handleRemoveFoodMenuItem = (index) => {
+    const updatedFoodMenu = [...event.foodMenu];
+    updatedFoodMenu.splice(index, 1);
+    setEvent({ ...event, foodMenu: updatedFoodMenu });
+  };
+
+  const handleRemoveEventInProgram = (index) => {
+    const updatedEventsInProgram = [...event.eventsInProgram];
+    updatedEventsInProgram.splice(index, 1);
+    setEvent({ ...event, eventsInProgram: updatedEventsInProgram });
+  };
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const newSportEvent = {
-      eventName,
-      eventDate,
-      eventLocation,
-      eventDescription,
-      eventImage,
-    };
-    createSportEvent(newSportEvent);
-    closeModal();
+
+    try {
+      const formData = new FormData();
+      formData.append("eventName", event.eventName);
+      formData.append("eventImage", event.eventImage);
+      formData.append("eventLocation", event.eventLocation);
+      formData.append("eventDescription", event.eventDescription);
+      formData.append("eventDate", event.eventDate);
+      formData.append("eventExpiry", event.eventExpiry);
+      formData.append("foodMenu", JSON.stringify(event.foodMenu));
+      formData.append("eventsInProgram", JSON.stringify(event.eventsInProgram));
+      formData.append("ticketPrice", event.ticketPrice);
+      formData.append("paymentPerStudent", event.paymentPerStudent);
+      formData.append("numberOfTicket", event.numberOfTicket);
+
+      const res = await TokenRequest.put(
+        `/events/v9/${programId}/update`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      fetchEvent();
+      setEvent({
+        eventName: "",
+        eventLocation: "",
+        eventDate: "",
+        eventExpiry: "",
+        eventImage: null,
+        foodMenu: [{ name: "" }],
+        eventsInProgram: [{ eventName: "" }],
+        eventDescription: "",
+        ticketPrice: "",
+        paymentPerStudent: "",
+        numberOfTicket: "",
+      });
+    } catch (error) {
+      // Handle error
+      console.error(error);
+    }
+
+    setIsModalOpenEdit(false);
   };
 
   return (
     <Modal
-      isOpen={isOpen}
-      onRequestClose={closeModal}
+      isOpen={isModalOpenEdit}
+      ariaHideApp={false}
+      onRequestClose={() => setIsModalOpenEdit(false)}
       style={{
         overlay: {
           zIndex: 1000,
@@ -47,97 +141,259 @@ const ModalCreateSport = ({ isOpen, closeModal, createSportEvent }) => {
       }}
     >
       <div className="modal-header flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Create Sport Event</h2>
+        <h2 className="text-xl font-bold">Edit Program</h2>
         <button
-          onClick={closeModal}
+          onClick={() => setIsModalOpenEdit(false)}
           className="text-blue-500 hover:text-blue-700"
         >
           <FaTimesCircle className="mr-1" size={20} color="red" />
         </button>
       </div>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label htmlFor="eventName" className="block mb-2">
-            Event Name:
-          </label>
-          <input
-            type="text"
-            id="eventName"
-            value={eventName}
-            onChange={(e) => setEventName(e.target.value)}
-            className="w-full border border-gray-300 rounded px-3 py-2"
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="eventDate" className="block mb-2">
-            Event Date:
-          </label>
-          <input
-            type="date"
-            id="eventDate"
-            value={eventDate}
-            onChange={(e) => setEventDate(e.target.value)}
-            className="w-full border border-gray-300 rounded px-3 py-2"
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="eventLocation" className="block mb-2">
-            Event Location:
-          </label>
-          <input
-            type="text"
-            id="eventLocation"
-            value={eventLocation}
-            onChange={(e) => setEventLocation(e.target.value)}
-            className="w-full border border-gray-300 rounded px-3 py-2"
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="eventDescription" className="block mb-2">
-            Event Description:
-          </label>
-          <textarea
-            id="eventDescription"
-            value={eventDescription}
-            onChange={(e) => setEventDescription(e.target.value)}
-            className="w-full border border-gray-300 rounded px-3 py-2"
-            required
-          ></textarea>
-        </div>
-        <div className="mb-4">
-          <label htmlFor="eventImage" className="block mb-2">
-            Event Image URL:
-          </label>
-          <input
-            type="text"
-            id="eventImage"
-            value={eventImage}
-            onChange={(e) => setEventImage(e.target.value)}
-            className="w-full border border-gray-300 rounded px-3 py-2"
-            required
-          />
-        </div>
-        <div className="flex justify-end">
+      <div className="modal-content">
+        <form onSubmit={handleSubmit}>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="eventName"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Event Name:
+            </label>
+            <input
+              type="text"
+              id="eventName"
+              name="eventName"
+              value={event.eventName}
+              onChange={(e) =>
+                setEvent({ ...event, eventName: e.target.value })
+              }
+              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="eventLocation"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Event Location:
+            </label>
+            <input
+              type="text"
+              id="eventLocation"
+              name="eventLocation"
+              value={event.eventLocation}
+              onChange={(e) =>
+                setEvent({ ...event, eventLocation: e.target.value })
+              }
+              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="eventDescription"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Event Description:
+            </label>
+            <input
+              type="text"
+              id="eventDescription"
+              name="eventDescription"
+              value={event.eventDescription}
+              onChange={(e) =>
+                setEvent({ ...event, eventDescription: e.target.value })
+              }
+              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="eventDate"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Event Date:
+            </label>
+            <input
+              type="date"
+              id="eventDate"
+              name="eventDate"
+              value={event.eventDate}
+              onChange={(e) =>
+                setEvent({ ...event, eventDate: e.target.value })
+              }
+              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="eventExpiry"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Event Expiry:
+            </label>
+            <input
+              type="date"
+              id="eventExpiry"
+              name="eventExpiry"
+              value={event.eventExpiry}
+              onChange={(e) =>
+                setEvent({ ...event, eventExpiry: e.target.value })
+              }
+              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="eventImage"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Event Image:
+            </label>
+            <input
+              type="file"
+              id="eventImage"
+              name="eventImage"
+              onChange={(e) =>
+                setEvent({ ...event, eventImage: e.target.files[0] })
+              }
+              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          {/* Food Menu inputs */}
+          {event.foodMenu.map((item, index) => (
+            <div key={index} className="form-group mb-4">
+              <label
+                htmlFor={`foodName${index}`}
+                className="block text-sm font-medium text-gray-700"
+              >
+                Food Name:
+              </label>
+              <input
+                type="text"
+                id={`foodName${index}`}
+                name="name"
+                value={item.name}
+                onChange={(e) => handleFoodMenuChange(e, index)}
+                className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+              {index > 0 && (
+                <button
+                  type="button"
+                  onClick={() => handleRemoveFoodMenuItem(index)}
+                  className="text-red-500 ml-2"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          ))}
           <button
             type="button"
-            onClick={closeModal}
-            className="px-4 py-2 bg-gray-300 text-gray-800 rounded mr-2"
+            onClick={handleAddFoodMenuItem}
+            className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
           >
-            Cancel
+            Add Food Item
           </button>
+
+          {/* Events in Program inputs */}
+          {event.eventsInProgram.map((item, index) => (
+            <div key={index} className="form-group mb-4">
+              <label
+                htmlFor={`eventsInProgram${index}`}
+                className="block text-sm font-medium text-gray-700"
+              >
+                EventsInProgram:
+              </label>
+              <input
+                type="text"
+                id={`eventsInProgram${index}`}
+                name="eventsInProgram"
+                value={item.eventsInProgram}
+                onChange={(e) => handleEventsInProgramChange(e, index)}
+                className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+              {index > 0 && (
+                <button
+                  type="button"
+                  onClick={() => handleRemoveEventInProgram(index)}
+                  className="text-red-500 ml-2"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={handleAddEventInProgram}
+            className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+          >
+            Add Event
+          </button>
+
+          <div className="form-group mb-4">
+            <label
+              htmlFor="ticketPrice"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Ticket Price:
+            </label>
+            <input
+              type="text"
+              id="ticketPrice"
+              name="ticketPrice"
+              value={event.ticketPrice}
+              onChange={(e) =>
+                setEvent({ ...event, ticketPrice: e.target.value })
+              }
+              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="paymentPerStudent"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Payment per Student:
+            </label>
+            <input
+              type="text"
+              id="paymentPerStudent"
+              name="paymentPerStudent"
+              value={event.paymentPerStudent}
+              onChange={(e) =>
+                setEvent({ ...event, paymentPerStudent: e.target.value })
+              }
+              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="form-group mb-4">
+            <label
+              htmlFor="numberOfTicket"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Number of Ticket:
+            </label>
+            <input
+              type="text"
+              id="numberOfTicket"
+              name="numberOfTicket"
+              value={event.numberOfTicket}
+              onChange={(e) =>
+                setEvent({ ...event, numberOfTicket: e.target.value })
+              }
+              className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded"
+            className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
           >
-            Create
+            Save Program
           </button>
-        </div>
-      </form>
+        </form>
+      </div>
     </Modal>
   );
 };
 
-export default ModalCreateSport;
+export default ModalEditProgam;

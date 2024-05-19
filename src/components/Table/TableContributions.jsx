@@ -24,7 +24,7 @@ const TableContributions = ({
     },
     { field: "firstName", headerName: "First Name", editable: true },
     { field: "lastName", headerName: "Last Name", editable: true },
-    { field: "age", headerName: "Age", width: 100 },
+    { field: "birthday", headerName: "Birthday", width: 100, editable: true },
     { field: "nationality", headerName: "Nationality", editable: true },
     { field: "gender", headerName: "Gender", width: 100 },
     { field: "email", headerName: "Email", editable: true },
@@ -54,7 +54,7 @@ const TableContributions = ({
     writeFile(wb, "contributions.xlsx");
   }, [formatStudentContributions]);
   const totalStudentContribution = formatStudentContributions.reduce(
-    (total, student) => total + student.payMoney,
+    (total, student) => total + parseFloat(student.payMoney),
     0
   );
   return (
@@ -96,7 +96,11 @@ const TableContributions = ({
           rowsPerPageOptions={[5, 10, 20]}
           disableSelectionOnClick
           loading={loading}
-          localeText={{ noRowsLabel: studentContributionsError }}
+          localeText={{
+            noRowsLabel: !studentContributionsError
+              ? "No contributions events found for the given event"
+              : "No data",
+          }}
           sx={{
             "& .MuiDataGrid-cell, & .MuiDataGrid-columnHeaderTitleContainer": {
               display: "flex",

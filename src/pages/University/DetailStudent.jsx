@@ -1,23 +1,20 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { IoPerson, IoBookOutline, IoCalendarOutline } from "react-icons/io5";
 import { FaGraduationCap, FaFacebook, FaRegAddressCard } from "react-icons/fa";
 import { RiInboxArchiveFill } from "react-icons/ri";
 import { FiMapPin, FiPhone } from "react-icons/fi";
+import { TokenRequest } from "../../RequestMethod/Request";
 
 const DetailStudent = () => {
-  const student = {
-    sex: "M",
-    username: "David Smith",
-    major: "Computer Science",
-    university: "Hanoi University of Science and Technology",
-    studentId: "20231000",
-    email: "david.smith@example.com",
-    facebookId: "david.smith.123",
-    dateOfBirth: "1998-05-15",
-    address: "123 Nguyen Trai Street, Hanoi, Vietnam",
-    phoneNumber: "+84 123 456 789",
-  };
+  const [student, setStudent] = useState(null);
 
+  useEffect(() => {
+    const fetchUser = async () => {
+      const res = await TokenRequest.get("/users/v1/profile");
+      setStudent(res.data);
+    };
+    fetchUser();
+  }, []);
   const studentImage = "/src/assets/Student.jpg";
 
   return (
