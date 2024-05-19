@@ -10,10 +10,12 @@ const University = () => {
   const [university, setUniversity] = useState([]);
   const userId = getDecodeToken().id;
   const rolesArray = [
-    { id: 1, roleName: "Admin" },
-    { id: 2, roleName: "Manager" },
-    { id: 3, roleName: "User" },
-    // Add more roles as needed
+    { id: 4, roleName: "Economics Leader" },
+    { id: 5, roleName: "Sports Leader" },
+    { id: 6, roleName: "Technical Leader" },
+    { id: 7, roleName: "Cultural Leader" },
+    { id: 8, roleName: "Communication Leader" },
+    { id: 9, roleName: "Leader" },
   ];
 
   useEffect(() => {
