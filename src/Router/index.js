@@ -70,6 +70,8 @@ const schRoutes = [
   // { path: configRouter.healthcare, component: Healthcare },
   { path: configRouter.dataStudent, component: DataStudent },
   { path: configRouter.sport, component: Sport },
+  { path: configRouter.detailSportEvent, component: DetailSport },
+  { path: configRouter.detailTeam, component: DetailTeam },
   { path: configRouter.profile, component: ProfileUser },
   { path: configRouter.notification, component: Notification },
 ];
@@ -94,6 +96,7 @@ const adminRoutes = [
   { path: adminConfigRouter.sport, component: Sport },
   { path: adminConfigRouter.detailSportEvent, component: DetailSport },
   { path: adminConfigRouter.managerUser, component: ManagerUser },
+  { path: configRouter.detailTeam, component: DetailTeam },
   { path: adminConfigRouter.profile, component: ProfileUser },
   { path: adminConfigRouter.notification, component: Notification },
 ];

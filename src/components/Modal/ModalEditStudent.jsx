@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Modal from "react-modal";
 import { FaTimesCircle } from "react-icons/fa";
-import { TokenRequest, publicRequest } from "../../RequestMethod/Request";
+import { TokenRequest } from "../../RequestMethod/Request";
 import { LoopCircleLoading } from "react-loadingg";
 
 const ModalEditStudent = ({
@@ -13,21 +13,23 @@ const ModalEditStudent = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [students, setStudents] = useState([]);
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchAllStudents = async () => {
       setLoading(true);
       try {
-        const res = await TokenRequest.get("/users/v1/all");
-        setStudents(res.data);
+        const res = await TokenRequest.get(
+          `/users/v1/all?limit=10&searchQuery=${searchQuery}`
+        );
+        setStudents(res.data.students);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching students:", error);
       }
     };
     fetchAllStudents();
-  }, [studentId]);
+  }, [searchQuery, studentId]);
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
@@ -35,7 +37,7 @@ const ModalEditStudent = ({
 
   const handleSelectClick = async (student) => {
     try {
-      const switchRoom = await publicRequest.put("/rooms/v3/switchrooms", {
+      const switchRoom = await TokenRequest.put("/rooms/v3/switchrooms", {
         userAId: studentId,
         userBId: student.id,
       });
@@ -102,50 +104,61 @@ const ModalEditStudent = ({
             className="divide-y divide-gray-200"
             style={{ overflowY: "auto" }}
           >
-            {filteredStudents
-              .filter((student) => student.id !== studentId)
-              .map((student) => (
-                <li
-                  key={student.id}
-                  className="flex items-center justify-between py-2"
-                >
+            {filteredStudents.map((student) => (
+              <li
+                key={student.id}
+                className="flex items-center justify-between py-2"
+              >
+                <div>
                   <div>
                     <p className="font-semibold">
                       {student.firstName} {student.lastName}
                     </p>
-                    <div className="text-sm text-gray-500">
-                      <p>Dorm: {student.Room?.Dormitory?.dormName}</p>
-                      <p>Room: {student.Room?.roomNumber}</p>
-                      <p>Birthday: {student.birthday}</p>
-                      <p>Nationality: {student.nationality}</p>
-                      <p>Gender: {student.gender}</p>
-                      <p>Email: {student.email}</p>
-                      <p>Phone Number: {student.phoneNumber}</p>
-                      <p
-                        className={
-                          student.graduated
-                            ? "text-green-600 font-bold"
-                            : "text-red-600 font-bold"
-                        }
-                      >
-                        Graduated: {student.graduated ? "Yes" : "No"}
-                      </p>
-
-                      <p className="text-yellow-700 font-bold">
-                        Left Room Go Home: {student.leftRoomYear}
-                      </p>
-                    </div>
-                  </div>
-                  <div>
-                    <button
-                      className="bg-blue-500 text-white px-3 py-1 rounded mr-2 cursor-pointer"
-                      onClick={() => handleSelectClick(student)}
+                    <p className="text-sm text-gray-500">
+                      Dorm: {student.Room?.Dormitory?.dormName}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Room: {student.Room?.roomNumber}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Birthday: {student.birthday}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Nationality: {student.nationality}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Gender: {student.gender}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Email: {student.email}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Phone Number: {student.phoneNumber}
+                    </p>
+                    <p
+                      className={
+                        student.graduated
+                          ? "text-green-600 font-bold"
+                          : "text-red-600 font-bold"
+                      }
                     >
-                      Select
-                    </button>
+                      Graduated: {student.graduated ? "Yes" : "No"}
+                    </p>
+                    <p className="text-yellow-700 font-bold">
+                      Left Room Go Home: {student.leftRoomYear}
+                    </p>
                   </div>
-                </li>
-              ))}
+                </div>
+                <div>
+                  <button
+                    className="bg-blue-500 text-white px-3 py-1 rounded mr-2 cursor-pointer"
+                    onClick={() => handleSelectClick(student)}
+                  >
+                    Select
+                  </button>
+                </div>
+              </li>
+            ))}
           </ul>
         )}
       </div>

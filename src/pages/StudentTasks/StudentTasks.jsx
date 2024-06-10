@@ -115,12 +115,16 @@ const StudentTasks = () => {
         <Select
           value={selectType}
           onChange={handleType}
-          options={[
-            { label: "Dormitory", value: "Dorms" },
-            { label: "University", value: "Univ" },
-            { label: "All", value: "All" },
-          ]}
-          defaultValue={{ label: "Dorms", value: "Dorms" }}
+          options={
+            role === "KTX"
+              ? [{ label: "Dormitory", value: "Dorms" }]
+              : role === "SCH"
+              ? [{ label: "University", value: "Univ" }]
+              : [
+                  { label: "Dormitory", value: "Dorms" },
+                  { label: "University", value: "Univ" },
+                ]
+          }
           placeholder="Select Type"
           className="w-60"
         />

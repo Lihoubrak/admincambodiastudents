@@ -168,10 +168,10 @@ const Program = () => {
                       </div>
                     </div>
                   </Link>
-                  <FaTrash
+                  {/* <FaTrash
                     className="absolute top-2 right-2 cursor-pointer text-red-500 hover:text-red-700 transition duration-300"
                     onClick={() => handleDeleteUniversity(university.id)}
-                  />
+                  /> */}
                 </div>
               ))}
             </div>

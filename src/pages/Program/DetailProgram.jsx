@@ -70,7 +70,8 @@ const DetailProgram = () => {
     useState(false);
   const [isModalCreateTicket, setIsModalOpenBuyTicket] = useState(false);
   const [addManager, setAddManager] = useState(false);
-
+  const [unsubscribeSnapshotListeners, setUnsubscribeSnapshotListeners] =
+    useState([]);
   const openModal = () => {
     setAddManager(true);
   };
@@ -198,16 +199,24 @@ const DetailProgram = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      await Promise.all([
+      const unsubscribeFunctions = await Promise.all([
         fetchProduct(),
         fetchSupport(),
         fetchParticipant(),
         fetchEvent(),
         fetchTicket(),
       ]);
+      setUnsubscribeSnapshotListeners(unsubscribeFunctions);
       setLoading(false);
     };
     fetchData();
+
+    // Clean up function to unsubscribe from listeners when component unmounts
+    return () => {
+      unsubscribeSnapshotListeners.forEach((unsubscribe) => {
+        unsubscribe();
+      });
+    };
   }, [detailProgramId]);
 
   const formatProduct = products.map((item, index) => ({

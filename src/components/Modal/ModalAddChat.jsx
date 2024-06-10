@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Modal from "react-modal";
 import { FaTimesCircle } from "react-icons/fa";
 import { TokenRequest } from "../../RequestMethod/Request";
@@ -14,28 +14,83 @@ const ModalAddChat = ({
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [nextPageToken, setNextPageToken] = useState(null);
+  const [hasMore, setHasMore] = useState(true);
   const currentUserId = getDecodeToken().id;
+  const userScrollData = useRef(null);
+
+  const fetchMoreUsers = async () => {
+    if (isLoading || !hasMore) return;
+
+    setIsLoading(true);
+    try {
+      const res = await TokenRequest.get(
+        `/users/v1/all?limit=6${
+          nextPageToken ? `&startAfter=${nextPageToken}` : ""
+        }${searchQuery ? `&searchQuery=${searchQuery}` : ""}`
+      );
+      const newUsers = res.data.students;
+      const newNextPageToken = res.data.nextPageToken;
+
+      setUsers((prevUsers) => [...prevUsers, ...newUsers]);
+      setNextPageToken(newNextPageToken);
+      setHasMore(newUsers.length > 0);
+    } catch (error) {
+      console.error("Error fetching more users:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchUsers = async () => {
+    const handleScroll = () => {
+      if (userScrollData.current) {
+        const { scrollTop, scrollHeight, clientHeight } =
+          userScrollData.current;
+        if (scrollTop + clientHeight >= scrollHeight - 10) {
+          fetchMoreUsers();
+        }
+      }
+    };
+
+    if (userScrollData.current) {
+      userScrollData.current.addEventListener("scroll", handleScroll);
+    }
+    return () => {
+      if (userScrollData.current) {
+        userScrollData.current.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, [isLoading, hasMore]);
+
+  useEffect(() => {
+    const fetchInitialUsers = async () => {
+      setIsLoading(true);
       try {
-        const res = await TokenRequest.get("/users/v1/all");
-        const allUsers = res.data;
-        // Filter out the current user
-        const filteredUsers = allUsers.filter(
-          (user) => user.id !== currentUserId
+        const res = await TokenRequest.get(
+          `/users/v1/all?limit=6${
+            searchQuery ? `&searchQuery=${searchQuery}` : ""
+          }`
         );
-        setUsers(filteredUsers);
-        setIsLoading(false);
+        const initialUsers = res.data.students;
+        const initialNextPageToken = res.data.nextPageToken;
+
+        setUsers(initialUsers);
+        setNextPageToken(initialNextPageToken);
+        setHasMore(initialUsers.length > 0);
       } catch (error) {
         console.error("Error fetching users:", error);
+      } finally {
         setIsLoading(false);
       }
     };
-    fetchUsers();
-  }, [currentUserId]);
 
-  const handleUserSelect = (user) => {
+    fetchInitialUsers();
+  }, [currentUserId, searchQuery]);
+
+  const handleUserSelect = (userId) => {
+    const user = users.find((u) => u.id === userId);
     setSelectedUser(user);
   };
 
@@ -91,36 +146,38 @@ const ModalAddChat = ({
         </button>
       </div>
       <div className="modal-content">
-        {isLoading ? (
+        <div className="search-bar mb-4">
+          <input
+            type="text"
+            placeholder="Search users"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none"
+          />
+        </div>
+        {isLoading && users.length === 0 ? (
           <div className="text-center">Loading...</div>
         ) : (
           <>
-            <div className="search-bar mb-4">
-              <input
-                type="text"
-                placeholder="Search users"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded focus:outline-none"
-              />
-            </div>
-            <div className="user-list">
+            <div
+              className="user-list max-h-64 overflow-y-auto"
+              ref={userScrollData}
+            >
               {users
                 .filter((user) =>
                   `${user.firstName} ${user.lastName}`
                     .toLowerCase()
                     .includes(searchQuery.toLowerCase())
                 )
-                .slice(0, 10)
                 .map((user) => (
                   <div
                     key={user.id}
                     className={`user-item cursor-pointer p-2 border-b border-gray-200 ${
                       selectedUser && selectedUser.id === user.id
-                        ? "bg-gray-200"
+                        ? "bg-blue-200"
                         : "hover:bg-gray-100"
                     }`}
-                    onClick={() => handleUserSelect(user)}
+                    onClick={() => handleUserSelect(user.id)}
                   >
                     <div className="flex items-center">
                       <img
@@ -132,7 +189,11 @@ const ModalAddChat = ({
                     </div>
                   </div>
                 ))}
+              {isLoading && (
+                <div className="text-center">Loading more users...</div>
+              )}
             </div>
+
             <div className="mt-4">
               <input
                 type="text"

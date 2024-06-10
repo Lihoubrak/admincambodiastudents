@@ -12,10 +12,8 @@ const StudentRoom = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRooms, setSelectedRooms] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [rooms, setRooms] = useState([]);
   const { dormId } = useParams();
-
   const openModal = () => {
     setIsModalOpen(true);
   };
@@ -59,13 +57,10 @@ const StudentRoom = () => {
     );
   });
   const fetchAllRooms = async () => {
-    setLoading(true);
     try {
       const res = await publicRequest.get(`/rooms/v3/all/${dormId}`);
       setRooms(res.data);
-      setLoading(false);
     } catch (error) {
-      setLoading(false);
       console.error("Error fetching rooms:", error);
     }
   };
@@ -75,56 +70,53 @@ const StudentRoom = () => {
 
   return (
     <div>
-      {loading ? (
-        <div className="flex items-center justify-center translate-y-52 -translate-x-3">
-          <LoopCircleLoading color="#007bff" />
+      <div>
+        <div className="flex justify-center items-center">
+          <h1 className="text-4xl gap-3 flex items-center font-bold mb-8 text-center text-blue-600">
+            <MdBedroomChild size={70} />
+            <span>ROOM</span>
+          </h1>
         </div>
-      ) : (
-        <div>
-          <div className="flex justify-center items-center">
-            <h1 className="text-4xl gap-3 flex items-center font-bold mb-8 text-center text-blue-600">
-              <MdBedroomChild size={70} />
-              <span>ROOM</span>
-            </h1>
+        <div className="flex items-center mb-4 gap-4">
+          <div className="">
+            <input
+              type="text"
+              placeholder="Search by Room"
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className="p-2 border border-gray-300 rounded-md outline-none"
+            />
           </div>
-          <div className="flex items-center mb-4 gap-4">
-            <div className="">
-              <input
-                type="text"
-                placeholder="Search by Room"
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="p-2 border border-gray-300 rounded-md outline-none"
-              />
-            </div>
-            <div
-              className={`cursor-pointer p-2 rounded-md overflow-hidden shadow-md border border-green-600 flex items-center justify-center bg-green-600 hover:bg-green-700 transition duration-300`}
-              onClick={handleSelectAllRooms}
-            >
-              <FaCheck className="text-white text-2xl" />
-            </div>
-            <div
-              onClick={openModal}
-              className={`cursor-pointer p-2 rounded-md overflow-hidden shadow-md border border-blue-600 flex items-center justify-center bg-blue-600 hover:bg-blue-700 transition duration-300`}
-            >
-              <FaPlus className="text-white text-2xl" />
-            </div>
-            <div
-              className={`cursor-pointer p-2 rounded-md overflow-hidden shadow-md border border-yellow-600 flex items-center justify-center bg-yellow-600 hover:bg-yellow-700 transition duration-300 ${
-                selectedRooms.length === 0
-                  ? "opacity-50 cursor-not-allowed"
-                  : ""
-              }`}
-              onClick={exportRooms}
-            >
-              <FaDownload className="text-white text-2xl" />
-            </div>
+          <div
+            className={`cursor-pointer p-2 rounded-md overflow-hidden shadow-md border border-green-600 flex items-center justify-center bg-green-600 hover:bg-green-700 transition duration-300`}
+            onClick={handleSelectAllRooms}
+          >
+            <FaCheck className="text-white text-2xl" />
           </div>
-          <h2 className="text-2xl font-bold mb-4 text-blue-600">
-            List Of Rooms
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredRooms.map((room) => (
+          <div
+            onClick={openModal}
+            className={`cursor-pointer p-2 rounded-md overflow-hidden shadow-md border border-blue-600 flex items-center justify-center bg-blue-600 hover:bg-blue-700 transition duration-300`}
+          >
+            <FaPlus className="text-white text-2xl" />
+          </div>
+          <div
+            className={`cursor-pointer p-2 rounded-md overflow-hidden shadow-md border border-yellow-600 flex items-center justify-center bg-yellow-600 hover:bg-yellow-700 transition duration-300 ${
+              selectedRooms.length === 0 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            onClick={exportRooms}
+          >
+            <FaDownload className="text-white text-2xl" />
+          </div>
+        </div>
+        <h2 className="text-2xl font-bold mb-4 text-blue-600">List Of Rooms</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {filteredRooms
+            .sort((a, b) =>
+              a.roomNumber.localeCompare(b.roomNumber, undefined, {
+                numeric: true,
+              })
+            )
+            .map((room) => (
               <div className="relative" key={room.id}>
                 <Link
                   to={`/dormitory/room/${room.id}`}
@@ -180,15 +172,14 @@ const StudentRoom = () => {
                 </button>
               </div>
             ))}
-          </div>
-          <ModalCreateRoom
-            isOpen={isModalOpen}
-            closeModal={closeModal}
-            dormId={dormId}
-            fetchAllRooms={fetchAllRooms}
-          />
         </div>
-      )}
+        <ModalCreateRoom
+          isOpen={isModalOpen}
+          closeModal={closeModal}
+          dormId={dormId}
+          fetchAllRooms={fetchAllRooms}
+        />
+      </div>
     </div>
   );
 };

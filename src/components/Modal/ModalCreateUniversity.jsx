@@ -155,7 +155,7 @@ const ModalCreateUniversity = ({ isOpen, closeModal }) => {
               className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
-          {universityInfo.image && (
+          {/* {universityInfo.image && (
             <div className="form-group mb-4">
               <label className="block text-sm font-medium text-gray-700">
                 Preview:
@@ -166,7 +166,7 @@ const ModalCreateUniversity = ({ isOpen, closeModal }) => {
                 className="mt-1 w-full"
               />
             </div>
-          )}
+          )} */}
           <button
             type="submit"
             className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"

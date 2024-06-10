@@ -1,71 +1,75 @@
 import React, { useEffect, useState } from "react";
-import { ModalCreateDormitory } from "../../components";
 import { Link } from "react-router-dom";
-import { FaHome, FaTrash } from "react-icons/fa"; // Import FaTrash for delete icon
-import { TokenRequest, publicRequest } from "../../RequestMethod/Request";
-import { LoopCircleLoading } from "react-loadingg";
-import { getDecodeToken } from "../../utils/getDecodeToken";
+import { FaHome } from "react-icons/fa"; // Import FaTrash for delete icon
 import {
-  collection,
-  doc,
   getDocs,
-  onSnapshot,
   query,
   where,
+  collection,
+  onSnapshot,
 } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
-import { configRouter } from "../../config/route";
+import { getDecodeToken } from "../../utils/getDecodeToken";
 
 const Dormitory = () => {
   const [dorm, setDorm] = useState([]);
+  const [loading, setLoading] = useState(false);
   const userId = getDecodeToken().id;
 
-  const rolesArray = [
-    { id: 4, roleName: "Economics Leader" },
-    { id: 5, roleName: "Sports Leader" },
-    { id: 6, roleName: "Technical Leader" },
-    { id: 7, roleName: "Cultural Leader" },
-    { id: 8, roleName: "Communication Leader" },
-    { id: 9, roleName: "Leader" },
-  ];
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
   useEffect(() => {
+    const unsubscribeFunctions = [];
+
     const fetchAllDorm = async () => {
       try {
+        setLoading(true);
         const dormData = [];
-        const dormQueries = rolesArray.map((role) =>
-          query(
+        const rolesArray = [
+          { id: 4, roleName: "Economics Leader" },
+          { id: 5, roleName: "Sports Leader" },
+          { id: 6, roleName: "Technical Leader" },
+          { id: 7, roleName: "Cultural Leader" },
+          { id: 8, roleName: "Communication Leader" },
+          { id: 9, roleName: "Leader" },
+        ];
+
+        for (const role of rolesArray) {
+          const q = query(
             collection(db, "dormitories"),
             where("managers", "array-contains", { userId, role: role.roleName })
-          )
-        );
+          );
 
-        for (const q of dormQueries) {
-          const querySnapshot = await getDocs(q);
-          querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            dormData.push({
-              id: doc.id,
-              dormName: data.dormName,
-              dormLocation: data.dormLocation,
-              dormDescription: data.dormDescription,
-              dormImage: data.dormImage,
+          const unsubscribe = onSnapshot(q, (querySnapshot) => {
+            const data = [];
+            querySnapshot.forEach((doc) => {
+              const dormInfo = doc.data();
+              data.push({
+                id: doc.id,
+                dormName: dormInfo.dormName,
+                dormLocation: dormInfo.dormLocation,
+                dormDescription: dormInfo.dormDescription,
+                dormImage: dormInfo.dormImage,
+              });
             });
+            setDorm((prevDorm) => [...prevDorm, ...data]);
           });
+          unsubscribeFunctions.push(unsubscribe);
         }
-
-        setDorm(dormData);
       } catch (error) {
         console.error("Error fetching dormitories: ", error);
+      } finally {
+        setLoading(false);
       }
     };
+
     fetchAllDorm();
-  }, [userId, rolesArray]);
+
+    // Clean up function to unsubscribe from queries when component unmounts
+    return () => {
+      unsubscribeFunctions.forEach((unsubscribe) => {
+        unsubscribe();
+      });
+    };
+  }, [userId]);
 
   return (
     <div>

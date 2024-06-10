@@ -50,6 +50,7 @@ const DetailSport = () => {
     const fetchSportDetail = async () => {
       try {
         const res = await TokenRequest.get(`/sports/v18/all/detail/${sportId}`);
+        console.log("res.datar", res.data);
         setSportEvent(res.data);
       } catch (error) {
         console.log(error);
@@ -108,7 +109,7 @@ const DetailSport = () => {
             <li className="mb-4">
               <span className="text-gray-700 font-bold mr-2">Created By:</span>
               <span className="text-gray-900">
-                {sportEvent.User.firstName} - {sportEvent.User.lastName}
+                {sportEvent.User?.firstName} - {sportEvent.User?.lastName}
               </span>
             </li>
           </ul>

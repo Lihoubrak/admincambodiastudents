@@ -64,7 +64,7 @@ const DetailRoom = () => {
         />
       ),
     },
-    { field: "birthday", headerName: "Birthday", width: 100 },
+    { field: "birthday", headerName: "Birthday", width: 100, editable: true },
     { field: "nationality", headerName: "Nationality", editable: true },
     { field: "gender", headerName: "Gender", width: 100 },
     { field: "email", headerName: "Email", editable: true },

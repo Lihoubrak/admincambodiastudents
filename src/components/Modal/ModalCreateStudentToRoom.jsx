@@ -16,16 +16,20 @@ const ModalCreateStudentToRoom = ({
 
   useEffect(() => {
     const fetchAllStudents = async () => {
+      setLoading(true); // Set loading to true when starting a new search
       try {
-        const res = await TokenRequest.get("/users/v1/all");
-        setStudents(res.data);
-        setLoading(false); // Set loading to false when data is fetched
+        const res = await TokenRequest.get(
+          `/users/v1/all?limit=10&searchQuery=${searchQuery}`
+        );
+        setStudents(res.data.students);
       } catch (error) {
         console.error("Error fetching students:", error);
+      } finally {
+        setLoading(false); // Set loading to false when the search is completed
       }
     };
     fetchAllStudents();
-  }, []);
+  }, [searchQuery]); // Add searchQuery as a dependency
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);

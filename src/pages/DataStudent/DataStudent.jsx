@@ -11,6 +11,7 @@ import { utils, writeFile } from "xlsx";
 import * as XLSX from "xlsx";
 import { TokenRequest, publicRequest } from "../../RequestMethod/Request";
 import { RiLockPasswordFill } from "react-icons/ri";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const DataStudent = () => {
   const importRef = useRef(null);
@@ -21,6 +22,8 @@ const DataStudent = () => {
   const [selectedDormitory, setSelectedDormitory] = useState("");
   const [schools, setSchools] = useState([]);
   const [dormitories, setDormitories] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
   const columns = [
     { field: "id", headerName: "ID", width: 100 },
     { field: "username", headerName: "Username", width: 150 },
@@ -33,12 +36,13 @@ const DataStudent = () => {
     { field: "phoneNumber", headerName: "Phone Number", width: 150 },
     { field: "facebook", headerName: "Facebook", width: 200 },
     { field: "zalo", headerName: "Zalo", width: 200 },
-    { field: "avatar", headerName: "Avatar", width: 200 },
+    // { field: "avatar", headerName: "Avatar", width: 200 },
     { field: "major", headerName: "Major", width: 150 },
     { field: "degree", headerName: "Degree", width: 150 },
     { field: "year", headerName: "YearStudy", width: 150 },
     { field: "room", headerName: "Room", width: 150 },
   ];
+
   useEffect(() => {
     const fetchAllDorm = async () => {
       const res = await TokenRequest.get(`/dorms/v2/all`);
@@ -77,6 +81,7 @@ const DataStudent = () => {
   };
 
   const handleSave = async () => {
+    setIsLoading(true);
     try {
       const promises = rows.map(async (item) => {
         const {
@@ -135,6 +140,8 @@ const DataStudent = () => {
     } catch (error) {
       console.error(error);
       window.alert("An error occurred while saving data!");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -178,10 +185,14 @@ const DataStudent = () => {
             />
           </div>
           <div
-            onClick={rows.length > 0 ? handleSave : null}
+            onClick={rows.length > 0 && !isLoading ? handleSave : null}
             className="cursor-pointer p-2 rounded-md overflow-hidden shadow-md border border-blue-600 flex items-center justify-center bg-blue-600 hover:bg-blue-700 transition duration-300"
           >
-            <FaSave className="text-white text-2xl" />
+            {isLoading ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              <FaSave className="text-white text-2xl" />
+            )}
           </div>
           <div className="cursor-pointer rounded-md overflow-hidden shadow-md border border-blue-600 flex items-center justify-center transition duration-300">
             <RiLockPasswordFill className="text-blue-600 mx-2" size={25} />
