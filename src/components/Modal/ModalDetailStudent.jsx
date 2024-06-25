@@ -32,6 +32,7 @@ const ModalDetailStudent = ({
         const response = await TokenRequest.get(
           `rooms/v3/usermaterials/${studentId}`
         );
+        console.log(response.data);
         const materialsData = response.data;
         setCheckedItems(materialsData);
         setError(null); // Clear error if successful

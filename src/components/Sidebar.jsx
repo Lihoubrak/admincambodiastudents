@@ -33,11 +33,11 @@ const Sidebar = ({ isSidebarOpen }) => {
         { icon: <FaBed size={25} />, label: "Dormitory", to: "/" },
         { icon: <FaInbox size={25} />, label: "Inbox", to: "/inbox" },
         { icon: <FaTasks size={25} />, label: "Student Tasks", to: "/tasks" },
-        {
-          icon: <FaMoneyBill size={25} />,
-          label: "Scholarships",
-          to: "/scholarships",
-        },
+        // {
+        //   icon: <FaMoneyBill size={25} />,
+        //   label: "Scholarships",
+        //   to: "/scholarships",
+        // },
         { icon: <FaPassport size={25} />, label: "Passport", to: "/passport" },
         {
           icon: <FaHospital size={25} />,

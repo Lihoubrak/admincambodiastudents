@@ -26,7 +26,7 @@ const DetailMajor = () => {
   const [isAddStudent, setIsAddStudent] = useState(false);
   const { majorId } = useParams();
   const navigation = useNavigate();
-  console.log("student", student);
+
   useEffect(() => {
     const fetchAllStudent = async () => {
       setLoading(true);
@@ -47,7 +47,6 @@ const DetailMajor = () => {
     fetchAllStudent();
   }, [majorId, selectedYear]);
 
-  // Sample data for the chart
   const chartData = [
     { name: "2020", pv: 2400 },
     { name: "2021", pv: 1398 },
@@ -71,7 +70,6 @@ const DetailMajor = () => {
 
   const handleDelete = async (id) => {
     try {
-      // Call API to remove the MajorId from the student
       await publicRequest.put(`/majors/v5/removemajor/${id}`);
       setStudent((prevStudents) => {
         return prevStudents.filter((student) => student.id !== id);
@@ -141,7 +139,21 @@ const DetailMajor = () => {
       width: 150,
       editable: true,
     },
-
+    {
+      field: "graduated",
+      headerName: "Graduated",
+      width: 150,
+      renderCell: (params) => (
+        <select
+          value={params.value ? "Yes" : "No"}
+          onChange={(e) => handleGraduatedChange(e, params.row.id)}
+          className="bg-white border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+        </select>
+      ),
+    },
     {
       field: "delete",
       headerName: "Action",

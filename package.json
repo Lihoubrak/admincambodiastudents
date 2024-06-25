@@ -17,6 +17,7 @@
     "@tippyjs/react": "^4.2.6",
     "axios": "^1.6.2",
     "date-fns": "^3.3.1",
+    "debounce": "^2.1.0",
     "firebase": "^10.9.0",
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",

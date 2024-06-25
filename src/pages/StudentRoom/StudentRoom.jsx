@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { FaPlus, FaCheck, FaDownload } from "react-icons/fa";
+import {
+  FaPlus,
+  FaCheck,
+  FaDownload,
+  FaCloudDownloadAlt,
+} from "react-icons/fa";
 import { LiaBedSolid } from "react-icons/lia";
 import { Link, useParams } from "react-router-dom";
 import { GrRadialSelected } from "react-icons/gr";
 import { ModalCreateRoom } from "../../components";
 import { MdBedroomChild } from "react-icons/md";
-import { publicRequest } from "../../RequestMethod/Request";
+import { TokenRequest, publicRequest } from "../../RequestMethod/Request";
 import { LoopCircleLoading } from "react-loadingg";
 
 const StudentRoom = () => {
@@ -13,7 +18,9 @@ const StudentRoom = () => {
   const [selectedRooms, setSelectedRooms] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [rooms, setRooms] = useState([]);
+  const [loading, setLoading] = useState(false); // State to track loading state
   const { dormId } = useParams();
+
   const openModal = () => {
     setIsModalOpen(true);
   };
@@ -50,12 +57,43 @@ const StudentRoom = () => {
     // Add your export logic here
   };
 
+  const createMaterialsForAll = async () => {
+    setLoading(true); // Set loading state to true
+
+    const materials = {
+      Cup: false,
+      Lamp: false,
+      Pillow: false,
+      Table: false,
+      Pillowcase: false,
+      Mattress: false,
+    };
+
+    try {
+      const res = await TokenRequest.post("/rooms/v3/material/create-for-all", {
+        dormId,
+        materials,
+      });
+
+      console.log(res.data.message);
+      window.alert("Materials created successfully for all users in the dorm!");
+      setLoading(false); // Reset loading state on success
+    } catch (error) {
+      console.error("Error creating materials for all users:", error);
+      window.alert(
+        "Error creating materials for all users. Please try again later."
+      );
+      setLoading(false); // Reset loading state on error
+    }
+  };
+
   const filteredRooms = rooms.filter((room) => {
     return (
       room.roomNumber.includes(searchTerm) ||
       room.numberOfStudents.toString().includes(searchTerm)
     );
   });
+
   const fetchAllRooms = async () => {
     try {
       const res = await publicRequest.get(`/rooms/v3/all/${dormId}`);
@@ -64,6 +102,7 @@ const StudentRoom = () => {
       console.error("Error fetching rooms:", error);
     }
   };
+
   useEffect(() => {
     fetchAllRooms();
   }, [dormId]);
@@ -100,12 +139,16 @@ const StudentRoom = () => {
             <FaPlus className="text-white text-2xl" />
           </div>
           <div
-            className={`cursor-pointer p-2 rounded-md overflow-hidden shadow-md border border-yellow-600 flex items-center justify-center bg-yellow-600 hover:bg-yellow-700 transition duration-300 ${
-              selectedRooms.length === 0 ? "opacity-50 cursor-not-allowed" : ""
+            className={`text-white cursor-pointer p-2 rounded-md overflow-hidden shadow-md border border-yellow-600 flex items-center justify-center bg-yellow-600 hover:bg-yellow-700 transition duration-300 ${
+              loading ? "opacity-50 cursor-not-allowed" : ""
             }`}
-            onClick={exportRooms}
+            onClick={createMaterialsForAll}
           >
-            <FaDownload className="text-white text-2xl" />
+            {loading ? (
+              <LoopCircleLoading color="#ffffff" size="small" />
+            ) : (
+              "Create Materials"
+            )}
           </div>
         </div>
         <h2 className="text-2xl font-bold mb-4 text-blue-600">List Of Rooms</h2>

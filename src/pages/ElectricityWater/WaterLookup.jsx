@@ -49,15 +49,9 @@ const WaterLookup = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
         const roomRes = await TokenRequest.get(`/rooms/v3/all/${dormId}`);
         setRoom(roomRes.data);
-        setLoading(false);
-        setError(null);
-      } catch (error) {
-        setLoading(false);
-        setError(error.response?.data?.error || "Error fetching data");
-      }
+      } catch (error) {}
     };
 
     fetchData();
@@ -82,7 +76,7 @@ const WaterLookup = () => {
       await publicRequest.post(`/waters/v8/create`, {
         formDataToSend,
       });
-      fetchWater();
+      await fetchWater();
       setFormData({
         date: formattedDate,
         room: "",

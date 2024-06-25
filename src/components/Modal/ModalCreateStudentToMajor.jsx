@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Modal from "react-modal";
 import { FaTimesCircle } from "react-icons/fa";
 import { TokenRequest, publicRequest } from "../../RequestMethod/Request";
+import debounce from "debounce";
 
 const ModalCreateStudentToMajor = ({
   setIsAddStudent,
@@ -10,17 +11,32 @@ const ModalCreateStudentToMajor = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [students, setStudents] = useState([]);
-  useEffect(() => {
-    const fetchAllStudents = async () => {
+  const [isLoading, setIsLoading] = useState(false); // State for loading indicator
+
+  const fetchAllStudents = useCallback(
+    debounce(async (query) => {
+      setIsLoading(true); // Set loading state to true when fetching starts
       try {
-        const res = await TokenRequest.get("/users/v1/all");
-        setStudents(res.data);
+        const res = await TokenRequest.get(
+          `/users/v1/all?limit=10&searchQuery=${query}`
+        );
+        if (res.data && res.data.students) {
+          setStudents(res.data.students);
+        } else {
+          console.error("Unexpected response format:", res.data);
+        }
       } catch (error) {
         console.error("Error fetching students:", error);
+      } finally {
+        setIsLoading(false); // Set loading state to false when fetching completes
       }
-    };
-    fetchAllStudents();
-  }, []);
+    }, 500), // Adjust the debounce delay as needed
+    []
+  );
+
+  useEffect(() => {
+    fetchAllStudents(searchQuery);
+  }, [searchQuery, fetchAllStudents]);
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
@@ -28,7 +44,7 @@ const ModalCreateStudentToMajor = ({
 
   const handleSelectClick = async (student) => {
     try {
-      const res = await publicRequest.put(`/majors/v5/addmajor`, {
+      await publicRequest.put(`/majors/v5/addmajor`, {
         majorId: majorId,
         userId: student.id,
       });
@@ -37,12 +53,6 @@ const ModalCreateStudentToMajor = ({
       setIsAddStudent(false);
     }
   };
-
-  const filteredStudents = students.filter(
-    (student) =>
-      student.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      student.lastName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   return (
     <Modal
@@ -72,7 +82,7 @@ const ModalCreateStudentToMajor = ({
           <h2 className="text-xl font-bold">Add Student</h2>
           <button
             onClick={() => setIsAddStudent(false)}
-            className=" flex items-center"
+            className="flex items-center"
           >
             <FaTimesCircle className="mr-1" size={20} color="red" />
           </button>
@@ -85,8 +95,11 @@ const ModalCreateStudentToMajor = ({
           className="border border-gray-300 rounded px-3 py-2 mb-4 w-full outline-none"
         />
 
+        {/* Loading indicator */}
+        {isLoading && <p className="text-center text-gray-500">Loading...</p>}
+
         <ul className="divide-y divide-gray-200" style={{ overflowY: "auto" }}>
-          {filteredStudents.map((student) => (
+          {students.map((student) => (
             <li
               key={student.id}
               className="flex items-center justify-between py-2"
@@ -102,10 +115,10 @@ const ModalCreateStudentToMajor = ({
                   Room: {student.Room?.roomNumber}
                 </p>
                 <p className="text-sm text-gray-500">
-                  School: {student.Major?.School.schoolName}
+                  School: {student.Major?.School?.schoolName}
                 </p>
                 <p className="text-sm text-gray-500">
-                  Major:{student.Major?.majorName}
+                  Major: {student.Major?.majorName}
                 </p>
                 <p className="text-sm text-gray-500">Age: {student.age}</p>
                 <p className="text-sm text-gray-500">

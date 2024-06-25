@@ -27,6 +27,7 @@ const ElectricityLookup = () => {
     support: 60,
     pricePerKwh: 2120.0,
   });
+
   const fetchElectrical = async () => {
     try {
       setLoading(true);
@@ -48,19 +49,12 @@ const ElectricityLookup = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
         const roomRes = await TokenRequest.get(`/rooms/v3/all/${dormId}`);
         setRoom(roomRes.data);
-        setLoading(false);
-        setError(null);
-      } catch (error) {
-        setLoading(false);
-        setError(error.response?.data?.error || "Error fetching data");
-      }
+      } catch (error) {}
     };
-
     fetchData();
-  }, []);
+  }, [dormId]);
 
   useEffect(() => {
     fetchElectrical();
@@ -78,10 +72,11 @@ const ElectricityLookup = () => {
     };
 
     try {
+      setLoading(true);
       await publicRequest.post(`/electricals/v7/create`, {
         formDataToSend,
       });
-      fetchElectrical();
+      await fetchElectrical();
       setFormData({
         date: formattedDate,
         room: "",
@@ -90,10 +85,14 @@ const ElectricityLookup = () => {
         pricePerKwh: 2120.0,
       });
     } catch (error) {
+      setLoading(false);
       setError(error.response?.data?.error || "Error submitting data");
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({
